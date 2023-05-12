@@ -2,10 +2,15 @@
 Analyze the spatial relationship between 2 image components using nearest neighbor-based spatial statistics.
 
 Title: Spatial Pattern Analysis using Closest Events (SPACE)
+
 Author: Andrew M. Soltisz
+
 Contact: andysoltisz@gmail.com
+
 Last Updated: 05/11/2023
+
 Acknowledgements: Rengasayee Veeraraghavan, Seth H. Weinberg, Peter F. Craigmile
+
 Citation: Andrew M. Soltisz (2023). SPACE - Spatial Pattern Analysis using Closest Events (https://github.com/andrewsoltisz/SPACE---Spatial-Pattern-Analysis-using-Closest-Events), GitHub. Retrieved [MONTH] [DAY], [YEAR].
 
 
@@ -13,12 +18,19 @@ Description: Spatial Pattern Analysis using Closest Events (SPACE) is an image a
 
 
 Abbreviation Definitions:
+
 •	CDF – empirical cumulative distribution function
+
 •	PDF – empirical probability density function
+
 •	NN – nearest neighbor
+
 •	SPACE – Spatial Pattern Analysis using Closest Events
+
 •	KS – nonparametric 2-sided Kolmogorov-Smirnov test of equality between 2 empirical distributions
+
 •	CSR – complete spatial randomness
+
 •	ROI – region of interest
 
 

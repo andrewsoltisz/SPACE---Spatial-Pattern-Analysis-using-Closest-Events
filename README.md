@@ -1,6 +1,8 @@
 # SPACE---Spatial-Pattern-Analysis-using-Closest-Events
 Analyze the spatial relationship between 2 image components using nearest neighbor-based spatial statistics.
 
+
+
 Title: Spatial Pattern Analysis using Closest Events (SPACE)
 
 Author: Andrew M. Soltisz
@@ -14,7 +16,9 @@ Acknowledgements: Rengasayee Veeraraghavan, Seth H. Weinberg, Peter F. Craigmile
 Citation: Andrew M. Soltisz (2023). SPACE - Spatial Pattern Analysis using Closest Events (https://github.com/andrewsoltisz/SPACE---Spatial-Pattern-Analysis-using-Closest-Events), GitHub. Retrieved [MONTH] [DAY], [YEAR].
 
 
+
 Description: Spatial Pattern Analysis using Closest Events (SPACE) is an image analysis framework for characterizing the spatial relationship between 2 image components using nearest neighbor-based spatial statistics. Given 2 image components X and Y, identified by the true pixels in their respective image masks X_mask and Y_mask, the spatial relationship of X relative to Y (X-->Y) and Y relative to X (Y-->X) are characterized by comparing the distribution of inter-pixel nearest neighbor distances (“observed” G-function) to the distribution produced by the distance between every pixel in the image to the nearest component pixel (“random” F-function). This relationship is summarized using a single output parameter, the spatial association index, computed as the maximum absolute difference between these functions, where negative values indicate a dispersed spatial relationship, positive values indicate aggregation, and value at-or-near 0 indicate that the image components are completely spatially random relative to one another. A single image can be analyzed by directly providing both logical masks as separate inputs to the SPACE function. The output will be table whose fields specify the coordinates of the aforementioned distribution functions and resulting spatial association index.  Batch analysis can be performed on a group of images by inputting cell arrays of logical masks. The output will be table whose fields specify the coordinates of the median-versions of the aforementioned distribution functions and resulting global spatial association index.  Additionally, you can specify the analysis be performed on only a subregion of the image by including a third input indicating the region of interest using a logical mask. Example scripts and images are provided to demonstrate the use of this framework.
+
 
 
 Abbreviation Definitions:
@@ -32,6 +36,7 @@ Abbreviation Definitions:
 •	CSR – complete spatial randomness
 
 •	ROI – region of interest
+
 
 
 Table field definitions for SPACE single-image analysis function output. Rows correspond to individual images, columns correspond to SPACE results for each image:
@@ -59,6 +64,8 @@ Table field definitions for SPACE single-image analysis function output. Rows co
 22.	YX_Delta_CDF_y – y-coordinates (delta probability) of Y-->X delta function
 23.	YX_Spatial_Association_Index – spatial association index for Y-->X. Computed as the absolute maximum of YX_Delta_CDF_y. 
 24.	YX_Spatial_Assocation_pValue – p-value from a 2-sided KS test comparing the Y-->X observed and random distributions. The null hypothesis states that these distributions are identical and therefor X-->Y is CSR
+
+
 
 Table field definitions for SPACE batch-image analysis function output. Rows correspond to individual batches of images, columns correspond to batch SPACE results for each group of images:
 1.	XY_Global_x – x-coordinates shared by all X-->Y functions and used to create their global y-coordinates
@@ -101,5 +108,3 @@ Table field definitions for SPACE batch-image analysis function output. Rows cor
 38.	YX_Sample_Spatial_Association_Index – List of Y-->X spatial association indices for individual images. Computed as the absolute maximum of each column in YX_Delta_CDF_y_Matrix. 
 39.	YX_Global_Spatial_Association_Index – Global spatial association index of Y-->X given all images in the batch. Computed as the absolute maximum of YX_Delta_CDF_y_Median.
 40.	YX_Global_CSR_Verdict – verdict of the test for CSR in Y-->X. Equal to ‘true’ if the YX median delta function quantile envelope (YX_Delta_CDF_y_Lower and YX_Delta_CDF_y_Upper) ever deviates from 0, and equal to ‘false’ if the envelope overlaps with 0 for the full distance range.
-
-

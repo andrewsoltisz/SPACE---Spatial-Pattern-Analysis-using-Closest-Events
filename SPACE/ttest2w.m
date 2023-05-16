@@ -4,8 +4,8 @@ function [p, h] = ttest2w(x, y, n_x, n_y, alpha)
 %
 % The weighted ttest is computed the same as MATLAB's built-in function
 % 'ttest2', but the weighted mean and variance are used in place of their
-% unweighted counterparts. These weighted values are defined on the webpage
-% - https://influentialpoints.com/Training/two-sample_t-test-principles-properties-assumptions.htm
+% unweighted counterparts. Weighted values are defined on the webpage:
+% https://support.sas.com/documentation/onlinedoc/stat/131/ttest.pdf
 %
 % Spatial Pattern Analysis using Closest Events (SPACE)
 % Author: Andrew M. Soltisz
@@ -37,9 +37,9 @@ mu_w_x = mu_w(x, n_x);
 mu_w_y = mu_w(y, n_y);
 
 % weighted variance
-var_w = @(a,n_a,df_a) ((sum((a.^2) .* n_a) / mean(n_a)) - df_a) / (df_a - 1);
-var_w_x = var_w(x, n_x, sz_x);
-var_w_y = var_w(y, n_y, sz_y);
+var_w = @(a, w, n, mu_w) sum(n.*((a - mu_w).^2)) / (n - 1);
+var_w_x = var_w(x, n_x, sz_x, mu_w_x);
+var_w_y = var_w(y, n_y, sz_y, mu_w_y);
 difference = mu_w_x - mu_w_y;
 
 % Calculate p-value

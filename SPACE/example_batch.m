@@ -6,7 +6,7 @@
 % into their own cell arrays and input them into the SPACE function.
 % Spatial association indices can be compared across groups using the
 % ttest2w function and median functions can easily be plotted with the
-% plot_median_fun function.
+% plot_error function.
 %
 % See readme documentation for a detailed description of the output table
 % fields.
@@ -51,9 +51,14 @@ xmax = max([Batch_Results.XY_Global_x{1}(end), Batch_Results.XY_Global_x{1}(end)
 % X-->Y CDFs
 subplot(2, 2, 1);
 hold on;
-p(1) = plot_median_fun(Batch_Results.XY_Observed_CDF_x{1}, Batch_Results.XY_Observed_CDF_y_Median{1}, Batch_Results.XY_Observed_CDF_y_Lower{1}, Batch_Results.XY_Observed_CDF_y_Upper{1}, X_color);
-p(2) = plot_median_fun(Batch_Results.XY_Random_CDF_x{1}, Batch_Results.XY_Random_CDF_y_Median{1}, Batch_Results.XY_Random_CDF_y_Lower{1}, Batch_Results.XY_Random_CDF_y_Upper{1}, X_color,'--'); 
-legend(p,["Observed","Random"],'location','southeast');
+[l(1), e(1)] = plot_error(Batch_Results.XY_Observed_CDF_x{1}, Batch_Results.XY_Observed_CDF_y_Median{1}, Batch_Results.XY_Observed_CDF_y_Lower{1}, Batch_Results.XY_Observed_CDF_y_Upper{1});
+[l(2), e(2)] = plot_error(Batch_Results.XY_Random_CDF_x{1}, Batch_Results.XY_Random_CDF_y_Median{1}, Batch_Results.XY_Random_CDF_y_Lower{1}, Batch_Results.XY_Random_CDF_y_Upper{1}); 
+l(1).Color = X_color;
+l(2).Color = 'k';
+l(2).LineStyle = '--';
+e(1).FaceColor = X_color;
+e(2).FaceColor = 'k';
+legend(l,["Observed","Random"],'location','southeast');
 title("X\rightarrowY Median CDFs");
 xlabel("Distance from Y", 'FontAngle', 'italic');
 xlim([0, xmax]);
@@ -66,9 +71,14 @@ hold off;
 % Y-->X CDFs
 subplot(2, 2, 2);
 hold on;
-p(1) = plot_median_fun(Batch_Results.YX_Observed_CDF_x{1}, Batch_Results.YX_Observed_CDF_y_Median{1}, Batch_Results.YX_Observed_CDF_y_Lower{1}, Batch_Results.YX_Observed_CDF_y_Upper{1}, Y_color); 
-p(2) = plot_median_fun(Batch_Results.YX_Random_CDF_x{1}, Batch_Results.YX_Random_CDF_y_Median{1}, Batch_Results.YX_Random_CDF_y_Lower{1}, Batch_Results.YX_Random_CDF_y_Upper{1}, Y_color,'--'); 
-legend(p,["Observed","Random"],'location','southeast');
+[l(1), e(1)] = plot_error(Batch_Results.YX_Observed_CDF_x{1}, Batch_Results.YX_Observed_CDF_y_Median{1}, Batch_Results.YX_Observed_CDF_y_Lower{1}, Batch_Results.YX_Observed_CDF_y_Upper{1}); 
+[l(2), e(2)] = plot_error(Batch_Results.YX_Random_CDF_x{1}, Batch_Results.YX_Random_CDF_y_Median{1}, Batch_Results.YX_Random_CDF_y_Lower{1}, Batch_Results.YX_Random_CDF_y_Upper{1}); 
+l(1).Color = Y_color;
+l(2).Color = 'k';
+l(2).LineStyle = '--';
+e(1).FaceColor = Y_color;
+e(2).FaceColor = 'k';
+legend(l,["Observed","Random"],'location','southeast');
 title("Y\rightarrowX Median CDFs");
 xlabel("Distance from X", 'FontAngle', 'italic');
 xlim([0, xmax]);
@@ -82,7 +92,9 @@ hold off;
 subplot(2, 2, 3);
 hold on;
 plot([0, xmax], [0, 0], 'k'); % plot y=0 to highlight x-axis
-plot_median_fun(Batch_Results.XY_Delta_CDF_x{1}, Batch_Results.XY_Delta_CDF_y_Median{1}, Batch_Results.XY_Delta_CDF_y_Lower{1}, Batch_Results.XY_Delta_CDF_y_Upper{1}, X_color);
+[p, e] = plot_error(Batch_Results.XY_Delta_CDF_x{1}, Batch_Results.XY_Delta_CDF_y_Median{1}, Batch_Results.XY_Delta_CDF_y_Lower{1}, Batch_Results.XY_Delta_CDF_y_Upper{1});
+p.Color = X_color;
+e.FaceColor = X_color;
 title("X\rightarrowY Median \DeltaCDF");
 xlabel("Distance from Y", 'FontAngle', 'italic');
 xlim([0, xmax]);
@@ -96,7 +108,9 @@ hold off;
 subplot(2, 2, 4);
 hold on;
 plot([0, xmax], [0, 0], 'k'); % plot y=0 to highlight x-axis
-plot_median_fun(Batch_Results.YX_Delta_CDF_x{1}, Batch_Results.YX_Delta_CDF_y_Median{1}, Batch_Results.YX_Delta_CDF_y_Lower{1}, Batch_Results.YX_Delta_CDF_y_Upper{1}, Y_color);
+[p, e] = plot_error(Batch_Results.YX_Delta_CDF_x{1}, Batch_Results.YX_Delta_CDF_y_Median{1}, Batch_Results.YX_Delta_CDF_y_Lower{1}, Batch_Results.YX_Delta_CDF_y_Upper{1});
+p.Color = Y_color;
+e.FaceColor = Y_color;
 title("Y\rightarrowX Median \DeltaCDF");
 xlabel("Distance from X", 'FontAngle', 'italic');
 xlim([0, xmax]);

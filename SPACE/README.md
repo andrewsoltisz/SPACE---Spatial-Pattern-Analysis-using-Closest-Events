@@ -1,5 +1,5 @@
 # SPACE---Spatial-Pattern-Analysis-using-Closest-Events
-Analyze the spatial relationship between 2 image components using nearest neighbor-based spatial statistics.
+Statistically characterize the spatial relationship between 2 image components using point pattern analysis.
 
 Title: SPACE - Spatial Pattern Analysis using Closest Events
 Author: Andrew M. Soltisz

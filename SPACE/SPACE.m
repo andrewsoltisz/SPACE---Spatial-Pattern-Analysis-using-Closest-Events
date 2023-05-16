@@ -1,14 +1,20 @@
 function [varargout] = SPACE(X_mask, Y_mask, ROI_mask)
 % Main function for performing 'Spatial Pattern Analysis using Closest
-% Events' (SPACE). To analyze an individual image, input your masks as
-% logical matrices. To analyze multiple images, input masks as elements of
-% a cell array. For subregion analysis, specify a region-of-interest (ROI)
-% within the image(s) with the optional ROI_mask input. If performing batch
-% image analysis, batch results will be the first output in the form of a
-% single-row table with columns for each SPACE result. If performing
-% individual image analysis, the results for each image will be the second
-% output in the form of a single table with rows correspong to each image
-% and columns for the various SPACE results.
+% Events' (SPACE) to characterize the spatial association between imaged
+% patterns X and Y whose events are indicated by the 'true' pixels in their
+% corresponding masks X_mask and Y_mask. All masks should be input as
+% logical matrices. To analyze multiple images, input cell arrays of
+% pattern masks. For optional subregion analysis, input a third mask which
+% specifies a region-of-interest (ROI) within the image(s) indicated by the
+% 'true' pixels in ROI_mask. If performing single image analysis, the
+% results will be output as a single-row table with columns corresponding
+% to the various single-image SPACE analysis results. If performing batch
+% image analysis, the batch results will be the first output in the form of
+% a single-row table with columns correspond to the varius SPACE batch
+% analysis result, and the second output will be the single-image analysis
+% results for each image in the batch in the form of a mutli-row table with
+% rows correspind to each image and columns corresponding to the various
+% single-image SPACE analysis results.
 %
 % See readme documentation for a detailed description of the output table
 % fields.
@@ -247,9 +253,10 @@ function [Batch_Results, Single_Results] = SPACE_batch(X_mask_list, Y_mask_list,
     end
     close(wb);
 
-    % X-->Y Batch Analysis  **************
-
     Batch_Results = table;
+    Batch_Results.Sample_Size = image_count;
+
+    % X-->Y Batch Analysis  **************
 
     % Calculate global distributions
     Batch_Results.XY_Global_x{1} = globalize_x(Single_Results.XY_Observed_x, Single_Results.XY_Random_x); % global x-coordinates
@@ -498,7 +505,7 @@ function [fun_y_median, fun_y_lower, fun_y_upper] = median_fun(fun_y_mat, fun_x,
 
 end
 
-function [spatial_assocation_index, verdict] = CSRtest_batch(delta_cdf_y, delta_cdf_lower, delta_cdf_upper)
+function [spatial_assocation_index, verdict] = CSRtest_batch(delta_cdf_median, delta_cdf_lower, delta_cdf_upper)
 % Test for complete spatial randomness (CSR) between 2 point patterns
 % captured by multiple images by evaluating whether the qunatile envelope
 % of the median delta function overlaps with 0. If the envelope psoitively
@@ -507,20 +514,43 @@ function [spatial_assocation_index, verdict] = CSRtest_batch(delta_cdf_y, delta_
 % sufficient evidence to conclude that the point patterns are dispersed.
 % And if the envelope overlaps 0 for the entire distance range, then there
 % is not sufficient evidence to differentiate the point patterns'
-% relationship from CSR. 
+% relationship from CSR. If there is deviation from zero, the global
+% spatial association index is defined as the value of the median function
+% at the absolute maximal deviation of the quantile envelope. Otherwise,
+% global spatial association is defined as the absolute maximum of the
+% median function.
 %
 % Spatial Pattern Analysis using Closest Events (SPACE)
 % Author: Andrew M. Soltisz
 % Email: andysoltisz@gmail.com
 % Last Updated: 05/11/2023
 
-    % compute global spatial association index
-    spatial_assocation_index = max(delta_cdf_y, [], 'comparisonmethod', 'abs');
+    lower_deviation = delta_cdf_lower > 0;
+    upper_deviation = delta_cdf_upper < 0;
+    
+    if any(lower_deviation) || any(upper_deviation)
+        verdict = true; % deviation from 0 detected
 
-    verdict = false;
-    if any(delta_cdf_lower > 0) || any(delta_cdf_upper < 0)
-        verdict = true;
-    end
+        % Calculate spatial association index
+        [lower_deviation_maxVal, lower_deviation_maxIdx] = max(abs(delta_cdf_lower(lower_deviation)));
+        [upper_deviation_maxVal, upper_deviation_maxIdx] = max(abs(delta_cdf_upper(upper_deviation)));
+        if isempty(lower_deviation_maxVal)
+            % no deviation here causes empty matrix and inequaily fails
+            lower_deviation_maxVal = 0;
+        end
+        if isempty(upper_deviation_maxVal)
+            % no deviation here causes empty matrix and inequaily fails
+            upper_deviation_maxVal = 0;
+        end
+        if lower_deviation_maxVal > upper_deviation_maxVal
+            spatial_assocation_index = delta_cdf_median(lower_deviation_maxIdx);
+        else
+            spatial_assocation_index = delta_cdf_median(upper_deviation_maxIdx);
+        end
+    else
+        verdict = false; % no deviation from 0 
+        spatial_assocation_index = max(delta_cdf_median, [], 'comparisonmethod', 'abs');
+    end 
 
 end
 

@@ -11,6 +11,4 @@ LinkedIn: https://www.linkedin.com/in/andrew-soltisz/
 
 Acknowledgements: Rengasayee Veeraraghavan, Seth H. Weinberg, Peter F. Craigmile
 
-
-
-Here you will find example code associated with the publication [INSERT REFERENCE].
+Reference: 

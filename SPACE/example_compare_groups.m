@@ -12,7 +12,7 @@
 % into their own cell arrays and input them into the SPACE function.
 % Spatial association indices can be compared across groups using the
 % ttest2w function and median functions can easily be plotted with the
-% plot_median_fun function.
+% plot_error function.
 %
 % See readme documentation for a detailed description of the output table
 % fields.
@@ -86,9 +86,14 @@ xmax = max([Batch_Results_dis.XY_Global_x{1}(end), Batch_Results_dis.YX_Global_x
 % Dispersed CDFs
 subplot(2, 3, 1);
 hold on;
-p(1) = plot_median_fun(Batch_Results_dis.XY_Observed_CDF_x{1}, Batch_Results_dis.XY_Observed_CDF_y_Median{1}, Batch_Results_dis.XY_Observed_CDF_y_Lower{1}, Batch_Results_dis.XY_Observed_CDF_y_Upper{1}, X_color); % dispersed observed CDF
-p(2) = plot_median_fun(Batch_Results_dis.XY_Random_CDF_x{1}, Batch_Results_dis.XY_Random_CDF_y_Median{1}, Batch_Results_dis.XY_Random_CDF_y_Lower{1}, Batch_Results_dis.XY_Random_CDF_y_Upper{1}, X_color,'--'); % dispersed random CDF
-legend(p,["Observed","Random"],'location','southeast');
+[l(1), e(1)] = plot_error(Batch_Results_dis.XY_Observed_CDF_x{1}, Batch_Results_dis.XY_Observed_CDF_y_Median{1}, Batch_Results_dis.XY_Observed_CDF_y_Lower{1}, Batch_Results_dis.XY_Observed_CDF_y_Upper{1}); % dispersed observed CDF
+[l(2), e(2)] = plot_error(Batch_Results_dis.XY_Random_CDF_x{1}, Batch_Results_dis.XY_Random_CDF_y_Median{1}, Batch_Results_dis.XY_Random_CDF_y_Lower{1}, Batch_Results_dis.XY_Random_CDF_y_Upper{1}); % dispersed random CDF
+l(1).Color = X_color;
+l(2).Color = 'k';
+l(2).LineStyle = '--';
+e(1).FaceColor = X_color;
+e(2).FaceColor = 'k';
+legend(l,["Observed","Random"],'location','southeast');
 title("Dispersed");
 xlabel("Distance from Y", 'FontAngle', 'italic');
 xlim([0, xmax]);
@@ -101,8 +106,13 @@ hold off;
 % Independent CDFs
 subplot(2,3 , 2);
 hold on;
-p(1) = plot_median_fun(Batch_Results_ind.XY_Observed_CDF_x{1}, Batch_Results_ind.XY_Observed_CDF_y_Median{1}, Batch_Results_ind.XY_Observed_CDF_y_Lower{1}, Batch_Results_ind.XY_Observed_CDF_y_Upper{1}, X_color); % independent observed CDF
-p(2) = plot_median_fun(Batch_Results_ind.XY_Random_CDF_x{1}, Batch_Results_ind.XY_Random_CDF_y_Median{1}, Batch_Results_ind.XY_Random_CDF_y_Lower{1}, Batch_Results_ind.XY_Random_CDF_y_Upper{1}, X_color,'--'); % independent random CDF
+[l(1), e(1)] = plot_error(Batch_Results_ind.XY_Observed_CDF_x{1}, Batch_Results_ind.XY_Observed_CDF_y_Median{1}, Batch_Results_ind.XY_Observed_CDF_y_Lower{1}, Batch_Results_ind.XY_Observed_CDF_y_Upper{1}); % independent observed CDF
+[l(2), e(2)] = plot_error(Batch_Results_ind.XY_Random_CDF_x{1}, Batch_Results_ind.XY_Random_CDF_y_Median{1}, Batch_Results_ind.XY_Random_CDF_y_Lower{1}, Batch_Results_ind.XY_Random_CDF_y_Upper{1}); % independent random CDF
+l(1).Color = X_color;
+l(2).Color = 'k';
+l(2).LineStyle = '--';
+e(1).FaceColor = X_color;
+e(2).FaceColor = 'k';
 title("Independent");
 xlabel("Distance from Y", 'FontAngle', 'italic');
 xlim([0, xmax]);
@@ -115,8 +125,13 @@ hold off;
 % Aggregated CDFs
 subplot(2,3,3);
 hold on;
-p(1) = plot_median_fun(Batch_Results_agg.XY_Observed_CDF_x{1}, Batch_Results_agg.XY_Observed_CDF_y_Median{1}, Batch_Results_agg.XY_Observed_CDF_y_Lower{1}, Batch_Results_agg.XY_Observed_CDF_y_Upper{1}, X_color); % aggregated observed CDF
-p(2) = plot_median_fun(Batch_Results_agg.XY_Random_CDF_x{1}, Batch_Results_agg.XY_Random_CDF_y_Median{1}, Batch_Results_agg.XY_Random_CDF_y_Lower{1}, Batch_Results_agg.XY_Random_CDF_y_Upper{1}, X_color,'--'); % aggregated random CDF
+[l(1), e(1)] = plot_error(Batch_Results_agg.XY_Observed_CDF_x{1}, Batch_Results_agg.XY_Observed_CDF_y_Median{1}, Batch_Results_agg.XY_Observed_CDF_y_Lower{1}, Batch_Results_agg.XY_Observed_CDF_y_Upper{1}); % aggregated observed CDF
+[l(2), e(2)] = plot_error(Batch_Results_agg.XY_Random_CDF_x{1}, Batch_Results_agg.XY_Random_CDF_y_Median{1}, Batch_Results_agg.XY_Random_CDF_y_Lower{1}, Batch_Results_agg.XY_Random_CDF_y_Upper{1}); % aggregated random CDF
+l(1).Color = X_color;
+l(2).Color = 'k';
+l(2).LineStyle = '--';
+e(1).FaceColor = X_color;
+e(2).FaceColor = 'k';
 title("Aggregated"); 
 xlabel("Distance from Y", 'FontAngle', 'italic');
 xlim([0, xmax]);
@@ -130,7 +145,9 @@ hold off;
 subplot(2, 3, 4);
 hold on;
 plot([0, xmax], [0, 0], 'k'); % plot black line across x-axis to highlight y=0
-plot_median_fun(Batch_Results_dis.XY_Delta_CDF_x{1}, Batch_Results_dis.XY_Delta_CDF_y_Median{1}, Batch_Results_dis.XY_Delta_CDF_y_Lower{1}, Batch_Results_dis.XY_Delta_CDF_y_Upper{1}, X_color); % dispersed delta CDF
+[p, e] = plot_error(Batch_Results_dis.XY_Delta_CDF_x{1}, Batch_Results_dis.XY_Delta_CDF_y_Median{1}, Batch_Results_dis.XY_Delta_CDF_y_Lower{1}, Batch_Results_dis.XY_Delta_CDF_y_Upper{1}); % dispersed delta CDF
+p.Color = X_color;
+e.FaceColor = X_color;
 xlabel("Distance from Y", 'FontAngle', 'italic');
 xlim([0, xmax]);
 ylabel("\DeltaP", 'FontAngle', 'italic');
@@ -143,7 +160,9 @@ hold off;
 subplot(2, 3, 5);
 hold on;
 plot([0, xmax], [0, 0], 'k'); % plot black line across x-axis to highlight y=0
-plot_median_fun(Batch_Results_ind.XY_Delta_CDF_x{1}, Batch_Results_ind.XY_Delta_CDF_y_Median{1}, Batch_Results_ind.XY_Delta_CDF_y_Lower{1}, Batch_Results_ind.XY_Delta_CDF_y_Upper{1}, X_color); % indpendent delta CDF
+[p, e] = plot_error(Batch_Results_ind.XY_Delta_CDF_x{1}, Batch_Results_ind.XY_Delta_CDF_y_Median{1}, Batch_Results_ind.XY_Delta_CDF_y_Lower{1}, Batch_Results_ind.XY_Delta_CDF_y_Upper{1}); % indpendent delta CDF
+p.Color = X_color;
+e.FaceColor = X_color;
 xlabel("Distance from Y", 'FontAngle', 'italic');
 xlim([0, xmax]);
 ylabel("\DeltaP", 'FontAngle', 'italic');
@@ -156,7 +175,9 @@ hold off;
 subplot(2, 3, 6);
 hold on;
 plot([0, xmax], [0, 0], 'k'); % plot black line across x-axis to highlight y=0
-plot_median_fun(Batch_Results_agg.XY_Delta_CDF_x{1}, Batch_Results_agg.XY_Delta_CDF_y_Median{1}, Batch_Results_agg.XY_Delta_CDF_y_Lower{1}, Batch_Results_agg.XY_Delta_CDF_y_Upper{1}, X_color); % aggregated delta CDF
+[p, e] = plot_error(Batch_Results_agg.XY_Delta_CDF_x{1}, Batch_Results_agg.XY_Delta_CDF_y_Median{1}, Batch_Results_agg.XY_Delta_CDF_y_Lower{1}, Batch_Results_agg.XY_Delta_CDF_y_Upper{1}); % aggregated delta CDF
+p.Color = X_color;
+e.FaceColor = X_color;
 xlabel("Distance from Y", 'FontAngle', 'italic');
 xlim([0, xmax]);
 ylabel("\DeltaP", 'FontAngle', 'italic');
@@ -173,9 +194,14 @@ sgtitle("Y\rightarrowX Spatial Relationship");
 % Dispersed CDFs
 subplot(2, 3, 1);
 hold on;
-p(1) = plot_median_fun(Batch_Results_dis.YX_Observed_CDF_x{1}, Batch_Results_dis.YX_Observed_CDF_y_Median{1}, Batch_Results_dis.YX_Observed_CDF_y_Lower{1}, Batch_Results_dis.YX_Observed_CDF_y_Upper{1}, Y_color); % dispersed observed CDF
-p(2) = plot_median_fun(Batch_Results_dis.YX_Random_CDF_x{1}, Batch_Results_dis.YX_Random_CDF_y_Median{1}, Batch_Results_dis.YX_Random_CDF_y_Lower{1}, Batch_Results_dis.YX_Random_CDF_y_Upper{1}, Y_color,'--'); % dispersed random CDF
-legend(p,["Observed","Random"],'location','southeast');
+[l(1), e(1)] = plot_error(Batch_Results_dis.YX_Observed_CDF_x{1}, Batch_Results_dis.YX_Observed_CDF_y_Median{1}, Batch_Results_dis.YX_Observed_CDF_y_Lower{1}, Batch_Results_dis.YX_Observed_CDF_y_Upper{1}); % dispersed observed CDF
+[l(2), e(2)] = plot_error(Batch_Results_dis.YX_Random_CDF_x{1}, Batch_Results_dis.YX_Random_CDF_y_Median{1}, Batch_Results_dis.YX_Random_CDF_y_Lower{1}, Batch_Results_dis.YX_Random_CDF_y_Upper{1}); % dispersed random CDF
+l(1).Color = Y_color;
+l(2).Color = 'k';
+l(2).LineStyle = '--';
+e(1).FaceColor = Y_color;
+e(2).FaceColor = 'k';
+legend(l,["Observed","Random"],'location','southeast');
 title("Dispersed");
 xlabel("Distance from X", 'FontAngle', 'italic');
 xlim([0, xmax]);
@@ -188,8 +214,13 @@ hold off;
 % Independent CDFs
 subplot(2,3 , 2);
 hold on;
-p(1) = plot_median_fun(Batch_Results_ind.YX_Observed_CDF_x{1}, Batch_Results_ind.YX_Observed_CDF_y_Median{1}, Batch_Results_ind.YX_Observed_CDF_y_Lower{1}, Batch_Results_ind.YX_Observed_CDF_y_Upper{1}, Y_color); % independent observed CDF
-p(2) = plot_median_fun(Batch_Results_ind.YX_Random_CDF_x{1}, Batch_Results_ind.YX_Random_CDF_y_Median{1}, Batch_Results_ind.YX_Random_CDF_y_Lower{1}, Batch_Results_ind.YX_Random_CDF_y_Upper{1}, Y_color,'--'); % independent random CDF
+[l(1), e(1)] = plot_error(Batch_Results_ind.YX_Observed_CDF_x{1}, Batch_Results_ind.YX_Observed_CDF_y_Median{1}, Batch_Results_ind.YX_Observed_CDF_y_Lower{1}, Batch_Results_ind.YX_Observed_CDF_y_Upper{1}); % independent observed CDF
+[l(2), e(2)] = plot_error(Batch_Results_ind.YX_Random_CDF_x{1}, Batch_Results_ind.YX_Random_CDF_y_Median{1}, Batch_Results_ind.YX_Random_CDF_y_Lower{1}, Batch_Results_ind.YX_Random_CDF_y_Upper{1}); % independent random CDF
+l(1).Color = Y_color;
+l(2).Color = 'k';
+l(2).LineStyle = '--';
+e(1).FaceColor = Y_color;
+e(2).FaceColor = 'k';
 title("Independent");
 xlabel("Distance from X", 'FontAngle', 'italic');
 xlim([0, xmax]);
@@ -202,8 +233,13 @@ hold off;
 % Aggregated CDFs
 subplot(2,3,3);
 hold on;
-p(1) = plot_median_fun(Batch_Results_agg.YX_Observed_CDF_x{1}, Batch_Results_agg.YX_Observed_CDF_y_Median{1}, Batch_Results_agg.YX_Observed_CDF_y_Lower{1}, Batch_Results_agg.YX_Observed_CDF_y_Upper{1}, Y_color); % aggregated observed CDF
-p(2) = plot_median_fun(Batch_Results_agg.YX_Random_CDF_x{1}, Batch_Results_agg.YX_Random_CDF_y_Median{1}, Batch_Results_agg.YX_Random_CDF_y_Lower{1}, Batch_Results_agg.YX_Random_CDF_y_Upper{1}, Y_color,'--'); % aggregated random CDF
+[l(1), e(1)] = plot_error(Batch_Results_agg.YX_Observed_CDF_x{1}, Batch_Results_agg.YX_Observed_CDF_y_Median{1}, Batch_Results_agg.YX_Observed_CDF_y_Lower{1}, Batch_Results_agg.YX_Observed_CDF_y_Upper{1}); % aggregated observed CDF
+[l(2), e(2)] = plot_error(Batch_Results_agg.YX_Random_CDF_x{1}, Batch_Results_agg.YX_Random_CDF_y_Median{1}, Batch_Results_agg.YX_Random_CDF_y_Lower{1}, Batch_Results_agg.YX_Random_CDF_y_Upper{1}); % aggregated random CDF
+l(1).Color = Y_color;
+l(2).Color = 'k';
+l(2).LineStyle = '--';
+e(1).FaceColor = Y_color;
+e(2).FaceColor = 'k';
 title("Aggregated"); 
 xlabel("Distance from X", 'FontAngle', 'italic');
 xlim([0, xmax]);
@@ -217,7 +253,9 @@ hold off;
 subplot(2, 3, 4);
 hold on;
 plot([0, xmax], [0, 0], 'k'); % plot black line across x-axis to highlight y=0
-plot_median_fun(Batch_Results_dis.YX_Delta_CDF_x{1}, Batch_Results_dis.YX_Delta_CDF_y_Median{1}, Batch_Results_dis.YX_Delta_CDF_y_Lower{1}, Batch_Results_dis.YX_Delta_CDF_y_Upper{1}, Y_color); % dispersed delta CDF
+[p, e] = plot_error(Batch_Results_dis.YX_Delta_CDF_x{1}, Batch_Results_dis.YX_Delta_CDF_y_Median{1}, Batch_Results_dis.YX_Delta_CDF_y_Lower{1}, Batch_Results_dis.YX_Delta_CDF_y_Upper{1}); % dispersed delta CDF
+p.Color = Y_color;
+e.FaceColor = Y_color;
 xlabel("Distance from X", 'FontAngle', 'italic');
 xlim([0, xmax]);
 ylabel("\DeltaP", 'FontAngle', 'italic');
@@ -230,7 +268,9 @@ hold off;
 subplot(2, 3, 5);
 hold on;
 plot([0, xmax], [0, 0], 'k'); % plot black line across x-axis to highlight y=0
-plot_median_fun(Batch_Results_ind.YX_Delta_CDF_x{1}, Batch_Results_ind.YX_Delta_CDF_y_Median{1}, Batch_Results_ind.YX_Delta_CDF_y_Lower{1}, Batch_Results_ind.YX_Delta_CDF_y_Upper{1}, Y_color); % indpendent delta CDF
+[p, e] = plot_error(Batch_Results_ind.YX_Delta_CDF_x{1}, Batch_Results_ind.YX_Delta_CDF_y_Median{1}, Batch_Results_ind.YX_Delta_CDF_y_Lower{1}, Batch_Results_ind.YX_Delta_CDF_y_Upper{1}); % indpendent delta CDF
+p.Color = Y_color;
+e.FaceColor = Y_color;
 xlabel("Distance from X", 'FontAngle', 'italic');
 xlim([0, xmax]);
 ylabel("\DeltaP", 'FontAngle', 'italic');
@@ -243,7 +283,9 @@ hold off;
 subplot(2, 3, 6);
 hold on;
 plot([0, xmax], [0, 0], 'k'); % plot black line across x-axis to highlight y=0
-plot_median_fun(Batch_Results_agg.YX_Delta_CDF_x{1}, Batch_Results_agg.YX_Delta_CDF_y_Median{1}, Batch_Results_agg.YX_Delta_CDF_y_Lower{1}, Batch_Results_agg.YX_Delta_CDF_y_Upper{1}, Y_color); % aggregated delta CDF
+[p, e] = plot_error(Batch_Results_agg.YX_Delta_CDF_x{1}, Batch_Results_agg.YX_Delta_CDF_y_Median{1}, Batch_Results_agg.YX_Delta_CDF_y_Lower{1}, Batch_Results_agg.YX_Delta_CDF_y_Upper{1}); % aggregated delta CDF
+p.Color = Y_color;
+e.FaceColor = Y_color;
 xlabel("Distance from X", 'FontAngle', 'italic');
 xlim([0, xmax]);
 ylabel("\DeltaP", 'FontAngle', 'italic');

@@ -1,15 +1,14 @@
 function [line_plot, shaded_error] = plot_error(x, y, error_lower, error_upper)
-% Function to plot a line with shaded error. If error is symetric about the
-% line, then specify y-coordinates of the absolute error (as opposed to
-% error relative to the line) as a single third input. If error is
-% asymmetric about the line with distinct upper and lower regimes, then
-% specify the y-coordinates of each regime as a third (lower) and fourth
-% (upper) inputs.
+% Function to plot a line with shaded error. Error bounds error_lower and
+% error_upper should be absolute error, as opposed to error defined
+% relative to the line (y). For example, at point (1,1) on the line, if
+% lower and upper error are y+1 and y-1, the corresponding values in
+% error_lower and error_upper should be 2 and 0, NOT +1 and -1. 
 %
 % Spatial Pattern Analysis using Closest Events (SPACE)
 % Author: Andrew M. Soltisz
 % Email: andysoltisz@gmail.com
-% Last Updated: 05/11/2023
+% Last Updated: 05/17/2023
 
     % Input validation
     if nargin < 4

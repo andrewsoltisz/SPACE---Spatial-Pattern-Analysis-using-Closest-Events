@@ -4,13 +4,15 @@ function [p, h] = ttest2w(x, y, n_x, n_y, alpha)
 %
 % The weighted ttest is computed the same as MATLAB's built-in function
 % 'ttest2', but the weighted mean and variance are used in place of their
-% unweighted counterparts. Weighted values are defined on the webpage:
+% unweighted counterparts.
+%
+% Reference:
 % https://support.sas.com/documentation/onlinedoc/stat/131/ttest.pdf
 %
 % Spatial Pattern Analysis using Closest Events (SPACE)
 % Author: Andrew M. Soltisz
 % Email: andysoltisz@gmail.com
-% Last Updated: 05/16/2023
+% Last Updated: 05/11/2023
 
 if nargin < 5
     alpha = 0.05; % default value
@@ -42,7 +44,7 @@ var_w_x = var_w(x, n_x, sz_x, mu_w_x);
 var_w_y = var_w(y, n_y, sz_y, mu_w_y);
 difference = mu_w_x - mu_w_y;
 
-% Calculate p-value
+% Calculate p-value (based on code found in built-in ttest2)
 sPooled = sqrt(((sz_x - 1) .* var_w_x + (sz_y - 1) .* var_w_y) ./ dfe);
 se = sPooled .* sqrt((1 ./ sz_x) + (1 ./ sz_y));
 ratio = difference ./ se;

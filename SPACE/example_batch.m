@@ -42,6 +42,20 @@ load([example_data, 'ROI_mask_list.mat']);
 
 %% Plot Results
 
+% show masks
+f = figure('position',[680   582   865   296]);
+tiledlayout(1,3,'TileSpacing','compact','Padding','compact')
+nexttile;
+mask1_color = gen_overlay(X_mask_list{1},Y_mask_list{1});
+imshow(imresize(mask1_color,4,'nearest'));
+nexttile;
+mask2_color = gen_overlay(X_mask_list{2},Y_mask_list{2});
+imshow(imresize(mask2_color,4,'nearest'));
+nexttile;
+mask3_color = gen_overlay(X_mask_list{3},Y_mask_list{3});
+imshow(imresize(mask3_color,4,'nearest'));
+sgtitle(f,"Representative Images");
+
 figure;
 sgtitle("Batch Image SPACE Results");
 X_color = 'r';

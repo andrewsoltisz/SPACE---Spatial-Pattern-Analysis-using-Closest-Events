@@ -10,7 +10,7 @@ function [p, h] = ttest2w(x, y, n_x, n_y, alpha)
 % Spatial Pattern Analysis using Closest Events (SPACE)
 % Author: Andrew M. Soltisz
 % Email: andysoltisz@gmail.com
-% Last Updated: 05/11/2023
+% Last Updated: 05/16/2023
 
 if nargin < 5
     alpha = 0.05; % default value
@@ -32,7 +32,7 @@ sz_y = numel(y);
 dfe = sz_x + sz_y - 2;
 
 % weighted mean
-mu_w = @(a, n_a) sum(a .* n_a) / sum(n_a);
+mu_w = @(a, n) sum(a .* n) / sum(n);
 mu_w_x = mu_w(x, n_x);
 mu_w_y = mu_w(y, n_y);
 

@@ -25,6 +25,8 @@ ttest2w.m - accessory function to compute the weighted version of a 2-sided Stud
 
 plot_error.m - accessory function to plot lines with shaded error region.
 
+gen_overlay.m - function to combined masks into a single RGB image.
+
 example_single.m - script with an example use of SPACE to analyze a single image.
 
 example_batch.m - script with an example use of SPACE to analyze a batch of images.

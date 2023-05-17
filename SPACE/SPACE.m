@@ -192,8 +192,9 @@ function [delta_cdf_x, delta_cdf_y, spatial_assocation_index, p_value, verdict] 
     [ks_p, ks_idx] = max(abs(delta_cdf_y));
     spatial_assocation_index = delta_cdf_y(ks_idx);
     
-    % Compute the asymptotic P-value approximation and accept or
-    % reject the null hypothesis on the basis of the P-value.
+    % Compute the asymptotic P-value approximation and accept or reject the
+    % null hypothesis on the basis of the P-value (based on code found in
+    % built-in kstest2)
     n = obs_n * ran_n / (obs_n + ran_n);
     lambda = max((sqrt(n) + 0.12 + 0.11 / sqrt(n)) * ks_p, 0);
     p_value  =  exp(-2 * lambda * lambda);

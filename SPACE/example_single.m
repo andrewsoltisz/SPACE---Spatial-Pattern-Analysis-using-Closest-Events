@@ -38,6 +38,22 @@ Results = SPACE(X_mask, Y_mask, ROI_mask);
 
 %% Plot Results
 
+% show masks
+figure('position',[680   582   865   296]);
+tiledlayout(1,3,'TileSpacing','compact','Padding','compact')
+nexttile;
+X_mask_color = gen_overlay(X_mask,false(size(X_mask)));
+imshow(imresize(X_mask_color,4,'nearest'));
+title("X Mask");
+nexttile;
+Y_mask_color = gen_overlay(false(size(X_mask)),Y_mask);
+imshow(imresize(Y_mask_color,4,'nearest'));
+title("Y Mask");
+nexttile;
+XY_mask_color = gen_overlay(X_mask,Y_mask);
+imshow(imresize(XY_mask_color,4,'nearest'));
+title("Combined Mask");
+
 % create 1 figure with subplots for each plot
 figure;
 sgtitle("Single Image SPACE Results");

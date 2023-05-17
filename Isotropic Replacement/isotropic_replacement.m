@@ -1,13 +1,18 @@
-function [isotropic_image, calibration_new] = isotropic_replacement(anisotropic_image, calibration_old)
+function [isotropic_image, calibration_new] = isotropic_replacement(anisotropic_image, calibration_old, calibration_new)
 % Correct spatially anisotropic images using isotropic replacement method
 % where signal pixels are placed into an isotropic image whose overall
 % (real-world) size matches the original image but it has been subdivided
 % to make isotropic. Signal pixels are placed into new pixels whose
 % (real-world) position most closely matches the position of the original
-% pixels. Input images must be masks in the form of logical matrices. If
+% pixels. Specify the original pixel size (length-units per pixel) via the
+% calibration_old input, and specify the desired new pixel size via the
+% (optional) calibration_new inpit. In no new calibration is specified, a
+% default size will be used as either the smallest of the original
+% calibration values or the largest divided by root-3, whichever value is
+% smaller. Input images must be masks in the form of logical matrices. If
 % correcting mutliple images, input a cell array of logical matrices. The
 % corrected image(s) will be output in the same format as the input (cell
-% array of logical matrices VS logical matric).
+% array of logical matrices VS logical matric). You can specify the desired
 % 
 % Author: Andrew M. Soltisz
 % Email: andysoltisz@gmail.com
@@ -18,13 +23,21 @@ function [isotropic_image, calibration_new] = isotropic_replacement(anisotropic_
     % check for correct number of inputs
     if nargin < 1
         error("Not enough input arguments.");
-    elseif nargin > 2
+    elseif nargin > 3
         error("Too many input arguments.");
     end
 
     % check shape of calibration input
     if ~isrow(calibration_old)
         error("Calibration must be a row vector.");
+    end
+    if nargin == 3
+        if ~isrow(calibration_old)
+            error("Calibration must be a row vector.");
+        end
+        if ~all(size(calibration_old) == size(calibration_new))
+            error("New and old image calibrations must be the same size.");
+        end
     end
 
     % check if first input is correct data types
@@ -52,6 +65,7 @@ function [isotropic_image, calibration_new] = isotropic_replacement(anisotropic_
     if numel(unique(calibration_old)) < 1 
         isotropic_image = anisotropic_image;
         calibration_new = calibration_old;
+        warning("Images are already isotropic. Original inputs returned.");
         return;
     end
 
@@ -60,16 +74,18 @@ function [isotropic_image, calibration_new] = isotropic_replacement(anisotropic_
     % make column vector for consistent formatting
     anisotropic_image = anisotropic_image(:);
 
-    % Calculate new image resolution
-    min_cal = min(calibration_old);
-    max_cal = max(calibration_old);
-    root3dim = max_cal / sqrt(3);
-    if min_cal <= root3dim
-        isotropic_distance = min_cal;
-    else
-        isotropic_distance = root3dim;
+    % Calculate new isotropic pixel size if none provided
+    if nargin == 2
+        min_cal = min(calibration_old);
+        max_cal = max(calibration_old);
+        root3dim = max_cal / sqrt(3);
+        if min_cal <= root3dim
+            isotropic_distance = min_cal;
+        else
+            isotropic_distance = root3dim;
+        end
+        calibration_new = repelem(isotropic_distance,numel(calibration_old));
     end
-    calibration_new = repelem(isotropic_distance,numel(calibration_old));
 
     % Get general info
     n_dims = ndims(anisotropic_image{1}); % is the image 2- or 3-D?

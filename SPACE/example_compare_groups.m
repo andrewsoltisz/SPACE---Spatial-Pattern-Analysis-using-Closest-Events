@@ -74,6 +74,22 @@ YX_p_ind_agg = ttest2w(Batch_Results_ind.YX_Sample_Spatial_Association_Index{1},
 
 %% Plot X-->Y Functions
 
+% show masks
+figure('position',[680   582   865   296]);
+tiledlayout(1,3,'TileSpacing','compact','Padding','compact')
+nexttile;
+mask1_color = gen_overlay(X_mask_list_dis{1},Y_mask_list_dis{1});
+imshow(imresize(mask1_color,4,'nearest'));
+title("Dispersed Signals");
+nexttile;
+mask2_color = gen_overlay(X_mask_list_ind{1},Y_mask_list_ind{1});
+imshow(imresize(mask2_color,4,'nearest'));
+title("Independent Signals");
+nexttile;
+mask3_color = gen_overlay(X_mask_list_agg{1},Y_mask_list_agg{1});
+imshow(imresize(mask3_color,4,'nearest'));
+title("Aggregated Signals");
+
 figure;
 X_color = 'r';
 Y_color = 'g';

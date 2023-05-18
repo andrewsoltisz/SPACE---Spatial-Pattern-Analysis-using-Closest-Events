@@ -11,7 +11,7 @@
 % Spatial Pattern Analysis using Closest Events (SPACE)
 % Author: Andrew M. Soltisz
 % Email: andysoltisz@gmail.com
-% Last Updated: 05/11/2023
+% Last Updated: 05/18/2023
 
 %% Prepare environment
 
@@ -32,9 +32,13 @@ X_mask = imread([example_data, 'X_mask.tif']);
 Y_mask = imread([example_data, 'Y_mask.tif']);
 ROI_mask = imread([example_data, 'ROI_mask.tif']);
 
-%% Single Image SPACE Analysis
+%% Single Image SPACE Analysis 
 
-Results = SPACE(X_mask, Y_mask, ROI_mask);
+% different use cases are listed below, un-comment one at a time
+% Results = SPACE(X_mask, Y_mask); % default ROI is full image
+% Results = SPACE(X_mask, Y_mask, ROI_mask); % specify ROI
+% Results = SPACE(X_mask, Y_mask, [], 0.2); % no ROI but pixel size of 0.2um is specified, input ROI as empty matrix
+Results = SPACE(X_mask, Y_mask, ROI_mask, 0.2); % Both ROI and pixel size of 0.2um are specified
 
 %% Plot Results
 

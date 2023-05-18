@@ -1,4 +1,4 @@
-function [isotropic_image, calibration_new] = isotropic_replacement(anisotropic_image, calibration_old, calibration_new)
+function [isotropic_mask, isotropic_ROI, calibration_new] = isotropic_replacement(anisotropic_mask, anisotropic_ROI, calibration_old, calibration_new)
 % Correct spatially anisotropic images using isotropic replacement method
 % where signal pixels are placed into an isotropic image whose overall
 % (real-world) size matches the original image but it has been subdivided
@@ -12,18 +12,20 @@ function [isotropic_image, calibration_new] = isotropic_replacement(anisotropic_
 % smaller. Input images must be masks in the form of logical matrices. If
 % correcting mutliple images, input a cell array of logical matrices. The
 % corrected image(s) will be output in the same format as the input (cell
-% array of logical matrices VS logical matric). You can specify the desired
+% array of logical matrices VS logical matric). You can specify the
+% desired. ROI mask must be provided because it is necessary for subsequent
+% analyses.
 % 
 % Author: Andrew M. Soltisz
 % Email: andysoltisz@gmail.com
-% Last Updated: 05/16/2023
+% Last Updated: 05/18/2023
 
     %% Input Validation
 
     % check for correct number of inputs
     if nargin < 1
         error("Not enough input arguments.");
-    elseif nargin > 3
+    elseif nargin > 4
         error("Too many input arguments.");
     end
 
@@ -31,39 +33,55 @@ function [isotropic_image, calibration_new] = isotropic_replacement(anisotropic_
     if ~isrow(calibration_old)
         error("Calibration must be a row vector.");
     end
-    if nargin == 3
+    if nargin == 4
         if ~isrow(calibration_old)
             error("Calibration must be a row vector.");
         end
         if ~all(size(calibration_old) == size(calibration_new))
             error("New and old image calibrations must be the same size.");
         end
+        % make sure new calibration is isotropic
+        if numel(unique(calibration_new)) > 1
+            error("Input new calibration is not isotropic.");
+        end
+        % make sure new calibration is no more than old calibration
+        if any(calibration_new > calibration_old)
+            error("Input new calibration must be <= old calibration.");
+        end
     end
 
     % check if first input is correct data types
     is_one_image = false;
-    if ~iscell(anisotropic_image)
+    if ~iscell(anisotropic_mask)
         is_one_image = true;
-        anisotropic_image = {anisotropic_image};
+        anisotropic_mask = {anisotropic_mask};
     end
-    if ~all(cellfun(@islogical,anisotropic_image))
-        error("Images must be a logical matrix or cell array of logical matrices.");
+    if ~all(cellfun(@islogical,anisotropic_mask))
+        error("Masks must be a logical matrix or cell array of logical matrices.");
+    end
+    if ~islogical(anisotropic_ROI)
+        error("ROI mask must be a logical matrix.");
     end
 
+
     % check if all images are the same size
-    im_sz = cellfun(@size, anisotropic_image, 'UniformOutput',false);
+    im_sz = cellfun(@size, anisotropic_mask, 'UniformOutput',false);
     if numel(unique(cellfun(@numel,im_sz))) > 1
         % check number of dimensions
-        error("Images are not all the same size.");
+        error("Masks are not all the same size.");
     end
     if ~isrow(unique(cell2mat(im_sz),'rows'))
         % check overall size
-        error("Images are not all the same size.");
+        error("Masks are not all the same size.");
+    end
+    im_sz_old = size(anisotropic_mask{1});
+    if ~all(im_sz_old == size(anisotropic_ROI))
+        error("ROI mask size does not match other masks.");
     end
 
     % check if image is already isotropic
     if numel(unique(calibration_old)) < 1 
-        isotropic_image = anisotropic_image;
+        isotropic_mask = anisotropic_mask;
         calibration_new = calibration_old;
         warning("Images are already isotropic. Original inputs returned.");
         return;
@@ -72,10 +90,10 @@ function [isotropic_image, calibration_new] = isotropic_replacement(anisotropic_
     %% Correct for Spatial Anisotropy
 
     % make column vector for consistent formatting
-    anisotropic_image = anisotropic_image(:);
+    anisotropic_mask = anisotropic_mask(:);
 
     % Calculate new isotropic pixel size if none provided
-    if nargin == 2
+    if nargin == 3
         min_cal = min(calibration_old);
         max_cal = max(calibration_old);
         root3dim = max_cal / sqrt(3);
@@ -85,14 +103,15 @@ function [isotropic_image, calibration_new] = isotropic_replacement(anisotropic_
             isotropic_distance = root3dim;
         end
         calibration_new = repelem(isotropic_distance,numel(calibration_old));
+    elseif nargin == 4
+        isotropic_distance = calibration_new(1);
     end
 
     % Get general info
-    n_dims = ndims(anisotropic_image{1}); % is the image 2- or 3-D?
+    n_dims = ndims(anisotropic_mask{1}); % is the image 2- or 3-D?
     scale_factors = calibration_old ./ isotropic_distance; % how each original calibration will be scaled
-    im_sz_old = size(anisotropic_image{1});
     im_sz_new = round(im_sz_old .* scale_factors); % size of corrected image
-    n_pixels = numel(anisotropic_image{1}); % calculate the total number of pixels in the original image
+    n_pixels = numel(anisotropic_mask{1}); % calculate the total number of pixels in the original image
 
     % determine isotropic subscripts for every pixel in the original image
     old_indices = (1:n_pixels)'; % get linear indices of every pixel in the original image
@@ -103,15 +122,16 @@ function [isotropic_image, calibration_new] = isotropic_replacement(anisotropic_
     isotropic_template = false(im_sz_new);
 
     % correct masks by converting anisotropic indices to isotropic indices
-    n_images = numel(anisotropic_image);
-    isotropic_image = repelem({false(im_sz_new)}, n_images, 1);
+    n_images = numel(anisotropic_mask);
+    isotropic_mask = repelem({false(im_sz_new)}, n_images, 1);
     for i_image = 1:n_images
-        isotropic_image{i_image} = replace_pixels(replacement_indices, isotropic_template, anisotropic_image{i_image});
+        isotropic_mask{i_image} = replace_pixels(replacement_indices, isotropic_template, anisotropic_mask{i_image});
     end
+    isotropic_ROI = replace_pixels(replacement_indices, isotropic_template, anisotropic_ROI);
 
     % return subject mask to matrix if only one was provided
     if is_one_image
-        isotropic_image = isotropic_image{1};
+        isotropic_mask = isotropic_mask{1};
     end
     
 end

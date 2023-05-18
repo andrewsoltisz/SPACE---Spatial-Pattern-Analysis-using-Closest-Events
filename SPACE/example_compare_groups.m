@@ -54,9 +54,9 @@ load([example_data, 'ROI_mask_list_agg.mat']);
 
 %% Batch image SPACE analysis for each group of example images
 
-[Batch_Results_dis, Single_Results_dis] = SPACE(X_mask_list_dis, Y_mask_list_dis, ROI_mask_list_dis);
-[Batch_Results_ind, Single_Results_ind] = SPACE(X_mask_list_ind, Y_mask_list_ind, ROI_mask_list_ind);
-[Batch_Results_agg, Single_Results_agg] = SPACE(X_mask_list_agg, Y_mask_list_agg, ROI_mask_list_agg);
+[Single_Results_dis, Batch_Results_dis] = SPACE(X_mask_list_dis, Y_mask_list_dis, ROI_mask_list_dis);
+[Single_Results_ind, Batch_Results_ind] = SPACE(X_mask_list_ind, Y_mask_list_ind, ROI_mask_list_ind);
+[Single_Results_agg, Batch_Results_agg] = SPACE(X_mask_list_agg, Y_mask_list_agg, ROI_mask_list_agg);
 
 %% Compare spatial association indices accross experimental groups using a weighted, 2-sided Student's T-test (ttest2w)
 

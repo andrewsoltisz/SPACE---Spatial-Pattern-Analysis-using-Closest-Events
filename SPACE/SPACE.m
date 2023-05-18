@@ -1,20 +1,49 @@
-function [varargout] = SPACE(X_mask, Y_mask, ROI_mask)
+function [varargout] = SPACE(X_mask, Y_mask, ROI_mask, pixel_size)
 % Main function for performing 'Spatial Pattern Analysis using Closest
 % Events' (SPACE) to characterize the spatial association between imaged
 % patterns X and Y whose events are indicated by the 'true' pixels in their
 % corresponding masks X_mask and Y_mask. All masks should be input as
 % logical matrices. To analyze multiple images, input cell arrays of
-% pattern masks. For optional subregion analysis, input a third mask which
-% specifies a region-of-interest (ROI) within the image(s) indicated by the
-% 'true' pixels in ROI_mask. If performing single image analysis, the
-% results will be output as a single-row table with columns corresponding
-% to the various single-image SPACE analysis results. If performing batch
-% image analysis, the batch results will be the first output in the form of
-% a single-row table with columns correspond to the varius SPACE batch
-% analysis result, and the second output will be the single-image analysis
-% results for each image in the batch in the form of a mutli-row table with
-% rows correspind to each image and columns corresponding to the various
-% single-image SPACE analysis results.
+% pattern masks. (Optional) For subregion analysis, input a third mask
+% which specifies a region-of-interest (ROI) within the image(s) indicated
+% by the 'true' pixels in ROI_mask. (Optional) If pixels have a real-world
+% size, provide the pixel(s) side-length as a fourth input to scale
+% distances accordingly - input an array of sizes for multiple image
+% analysis. If performing single image analysis, the results will be output
+% as a single-row table with columns corresponding to the various
+% single-image SPACE analysis results. If performing batch image analysis,
+% the batch results will be the second output in the form of a single-row
+% table with columns correspond to the varius SPACE batch analysis result,
+% and the first output will be the single-image analysis results for each
+% image in the batch in the form of a mutli-row table with rows correspind
+% to each image and columns corresponding to the various single-image SPACE
+% analysis results.
+%
+% USES CASES:
+% 
+% [...] = SPACE(X_mask, Y_mask) perform analysis without specifiying an
+% ROI or pixel size. Here, the ROI is treated as the entire image and the
+% pixel is given a size of 1.
+%
+% [...] = SPACE(X_mask, Y_mask, ROI_mask) perform analysis of subregions
+% specified by ROI_mask. Pixels are given a size of 1.
+%
+% [...] = SPACE(X_mask, Y_mask, [], pixel_size) perform analysis on
+% entire image but pixels are given sizes acording to pixel_size
+%
+% [...] = SPACE(X_mask, Y_mask, ROI_mask, pixel_size) perform subregion
+% analysis with user defined pixel size.
+%
+% [Sinlge_Results] = SPACE(...) returns a table containing the single-image
+% results for each input image. If only one image provided, the table will
+% have only one row. If n-images are provided, the table will have n-rows,
+% with row-i containing the SPACE results for image-i.
+%
+% [Single_Results, Batch_Results] = SPACE(...) if cell arrays of masks are
+% provided to the function, the first output is the single-image results as
+% described above, and the second output is a sinlge-row table containing
+% batch-image results which describes the aggregated behavior of the image
+% collection. 
 %
 % See readme documentation for a detailed description of the output table
 % fields.
@@ -22,44 +51,57 @@ function [varargout] = SPACE(X_mask, Y_mask, ROI_mask)
 % Spatial Pattern Analysis using Closest Events (SPACE)
 % Author: Andrew M. Soltisz
 % Email: andysoltisz@gmail.com
-% Last Updated: 05/11/2023
+% Last Updated: 05/18/2023
 
     % Check for appropriate number of inputs
     if nargin < 2
         error("Not enough input arguments.");
-    elseif nargin > 3
+    elseif nargin > 4
         error("Too many input arguments.");
     end
 
     % Check if user is performing single-image analysis
     if islogical(X_mask) && islogical(Y_mask)
+        if nargout > 1
+            error("Too many output arguments.");
+        end
         if nargin == 2
-            Single_Results = SPACE_single(X_mask, Y_mask, ROI_mask);
+            Single_Results = SPACE_single(X_mask, Y_mask);
         elseif nargin == 3
             Single_Results = SPACE_single(X_mask, Y_mask, ROI_mask);
+        else
+            Single_Results = SPACE_single(X_mask, Y_mask, ROI_mask, pixel_size);
         end
         varargout = {Single_Results};
     end
 
     % Check if user is performing batch-image analysis
     if iscell(X_mask) && iscell(Y_mask)
-        if nargin == 2
-            [Batch_Results, Single_Results] = SPACE_batch(X_mask, Y_mask);
-        elseif nargin == 3
-            [Batch_Results, Single_Results] = SPACE_batch(X_mask, Y_mask, ROI_mask);
+        if nargout > 2
+            error("Too many output arguments.");
         end
-        varargout = {Batch_Results, Single_Results};
+        if nargin == 2
+            [Single_Results, Batch_Results] = SPACE_batch(X_mask, Y_mask);
+        elseif nargin == 3
+            [Single_Results, Batch_Results] = SPACE_batch(X_mask, Y_mask, ROI_mask);
+        elseif nargin == 4
+            [Single_Results, Batch_Results] = SPACE_batch(X_mask, Y_mask, ROI_mask, pixel_size);
+        end
+        varargout = {Single_Results, Batch_Results};
     end
 
 end
 
 %% Single Image Analysis Functions
 
-function [Results] = SPACE_single(X_mask, Y_mask, ROI_mask)
+function [Results] = SPACE_single(X_mask, Y_mask, ROI_mask, pixel_size)
 % Perform 'Spatial Pattern Analysis using Closest Events' (SPACE) of
 % spatial point patterns X and Y whose events are identified by positive
-% pixels in X_mask and Y_mask. Perform sub-region analysis by specifying a
-% region of interest (ROI) identified by the positive pixels in ROI_mask. 
+% pixels in X_mask and Y_mask. (Optional) Perform sub-region analysis by
+% specifying a region of interest (ROI) identified by the positive pixels
+% in ROI_mask. (Optional) If pixels have a real-world size, provide their
+% side length in pixel_size - the x-coordinates of all functions will be
+% scaled accordingly.
 %
 % See readme documentation for a detailed description of the output table
 % fields.
@@ -77,7 +119,7 @@ function [Results] = SPACE_single(X_mask, Y_mask, ROI_mask)
     % Define default ROI
     if nargin < 3 % no ROI provided, create default
         ROI_mask = true(X_size);
-    elseif nargin == 3
+    elseif nargin > 2
         if isempty(ROI_mask) % ROI is empty, create default
             ROI_mask = true(X_size);
         end
@@ -94,12 +136,21 @@ function [Results] = SPACE_single(X_mask, Y_mask, ROI_mask)
         error("Masks must be logical matrices.");
     end
 
+    % Make sure pixel length 
+    if nargin == 4
+        if ~(isscalar(pixel_size) && isnumeric(pixel_size))
+            error("Pixel size must be a scalar number.");
+        end
+    else
+        pixel_size = 1; % default value
+    end
+
     % Compute distribution functions  **************
 
     Results = table;
 
     % Characterize the spatial relationship of X relative to Y (X-->Y)
-    Y_dt = bwdist(Y_mask); % distance transformation of Y's mask
+    Y_dt = bwdist(Y_mask) * pixel_size; % distance transformation of Y's mask
     XY_Observed_NN_Distances = Y_dt(X_mask & ROI_mask); % calculate observed nearest neighbor (NN) distances
     XY_Random_NN_Distances = Y_dt(ROI_mask); % calculate random nearest neighbor (NN) distances
     Results.XY_Observed_Event_Count = numel(XY_Observed_NN_Distances); % number of observed X events
@@ -111,7 +162,7 @@ function [Results] = SPACE_single(X_mask, Y_mask, ROI_mask)
     [Results.XY_Delta_CDF_x{1}, Results.XY_Delta_CDF_y{1}, Results.XY_Spatial_Association_Index, Results.XY_Spatial_Assocation_pValue] = CSRtest_single(Results.XY_Observed_x{1}, Results.XY_Observed_PDF_y{1}, Results.XY_Observed_Event_Count, Results.XY_Random_x{1}, Results.XY_Random_PDF_y{1}, Results.XY_Random_Event_Count); % compare observed and random CDFs
 
     % Characterize the spatial relationship of Y relative to X (Y-->X)
-    X_dt = bwdist(X_mask); % distance transformation of X's mask
+    X_dt = bwdist(X_mask) * pixel_size; % distance transformation of X's mask
     YX_Observed_NN_Distances = X_dt(Y_mask & ROI_mask); % calculate observed nearest neighbor (NN) distances
     YX_Random_NN_Distances = X_dt(ROI_mask); % calculate random nearest neighbor (NN) distances
     Results.YX_Observed_Event_Count = numel(YX_Observed_NN_Distances); % number of observed Y events
@@ -204,15 +255,35 @@ end
 
 %% Batch Image Analysis Functions
 
-function [Batch_Results, Single_Results] = SPACE_batch(X_mask_list, Y_mask_list, ROI_mask_list)
+function [Single_Results, Batch_Results] = SPACE_batch(X_mask_list, Y_mask_list, ROI_mask_list, pixel_size_list)
 % Perform 'Spatial Pattern Analysis using Closest Events' (SPACE) on
 % multiple samples of spatial point patterns X and Y whose events are
 % identified by positive pixels in the cell array of image masks,
-% X_mask_list and Y_mask_list. Perform sub-region analysis by specifying a
-% region of interest (ROI) identified by the positive pixels in each mask
-% contained in the cell array ROI_mask_list. Batch results are output in
-% the SPACE_Group table and individual image results are output in the
-% SPACE_Sample table. 
+% X_mask_list and Y_mask_list. (Optional) Perform sub-region analysis by
+% specifying a region of interest (ROI) identified by the positive pixels
+% in each mask contained in the cell array ROI_mask_list. (Optional) If
+% pixels have a real-world size, provide the pixel-side-length for each
+% image in the vector pixel_size_list - the x-coordinates of all functions
+% will be scaled accordingly. Batch results are output in the SPACE_Group
+% table and individual image results are output in the SPACE_Sample table.
+% 
+% USES CASES:
+% 
+% 1. [...] = SPACE_batch(X_mask_list, Y_mask_list) perform analysis without
+% specifiying an ROI or pixel size. Here, the ROI is treated as the entire
+% image and the pixel is given a size of 1.
+%
+% 2. [...] = SPACE_batch(X_mask_list, Y_mask_list, ROI_mask_list) perform
+% analysis of subregions specified by ROI_mask_list. Pixels are given a
+% size of 1.
+%
+% 3. [...] = SPACE_batch(X_mask_list, Y_mask_list, [], pixel_size_list)
+% perform analysis on entire image but pixels are given sizes acording to
+% pixel_size_list
+%
+% 4. [...] = SPACE_batch(X_mask_list, Y_mask_list, ROI_mask_list,...
+% pixel_size_list) perform subregion analysis with user defined pixel
+% sizes.
 %
 % See readme documentation for a detailed description of the output table
 % fields.
@@ -227,20 +298,40 @@ function [Batch_Results, Single_Results] = SPACE_batch(X_mask_list, Y_mask_list,
     % Convert everything to column vectors for consistent formatting
     X_mask_list = X_mask_list(:);
     Y_mask_list = Y_mask_list(:);
-    ROI_mask_list = ROI_mask_list(:);
+    inputs = {X_mask_list, Y_mask_list};
 
-    X_mask_count = numel(X_mask_list);
-    Y_mask_count = numel(Y_mask_list);
-    ROI_mask_count = numel(ROI_mask_list);
+    if nargin > 2
+        ROI_provided = ~isempty(ROI_mask_list);
+        if ~iscell(ROI_mask_list) && ROI_provided
+            error("ROI mask lists must be cell arrays");
+        end
+        if ROI_provided
+            ROI_mask_list = ROI_mask_list(:);
+            inputs{end+1} = ROI_mask_list;
+        end
+        if ~ROI_provided && nargin == 3
+            error("ROI mask list is empty.");
+        end
+    else
+        ROI_provided = false;
+    end
+    if nargin == 4
+        if ~(isnumeric(pixel_size_list) && isvector(pixel_size_list))
+            error("Pixel size list must be a numeric vector.");
+        end
+        pixel_size_list = pixel_size_list(:);
+        inputs{end+1} = pixel_size_list;
+    end
 
     % Make sure there are the same number of masks in each list
-    if numel(unique([X_mask_count, Y_mask_count, ROI_mask_count])) > 1
-        error("Mask cell arrays are of different lengths.");
+    inputs_count = cellfun(@numel,inputs);
+    if numel(unique(inputs_count)) > 1
+        error("Input lengths do not match.");
     end
-    image_count = X_mask_count;
+    image_count = inputs_count(1);
 
     % Make sure each mask is a cell array
-    if ~iscell(X_mask_list) || ~ iscell(Y_mask_list) || ~ iscell(ROI_mask_list)
+    if ~iscell(X_mask_list) || ~iscell(Y_mask_list)
         error("Mask lists must be cell arrays");
     end
 
@@ -248,9 +339,26 @@ function [Batch_Results, Single_Results] = SPACE_batch(X_mask_list, Y_mask_list,
     
     Single_Results = table;
     wb = waitbar(0, sprintf("Analyzing image: %i/%i", 0, image_count));
-    for i_image = 1:image_count
-        Single_Results(i_image,:) = SPACE_single(X_mask_list{i_image}, Y_mask_list{i_image}, ROI_mask_list{i_image});
-        waitbar(i_image/image_count, wb, sprintf("Analyzing image: %i/%i", i_image, image_count));
+    if nargin == 2 % use 1
+        for i_image = 1:image_count
+            Single_Results(i_image,:) = SPACE_single(X_mask_list{i_image}, Y_mask_list{i_image});
+            waitbar(i_image/image_count, wb, sprintf("Analyzing image: %i/%i", i_image, image_count));
+        end
+    elseif nargin == 3 % use 2
+        for i_image = 1:image_count
+            Single_Results(i_image,:) = SPACE_single(X_mask_list{i_image}, Y_mask_list{i_image}, ROI_mask_list{i_image});
+            waitbar(i_image/image_count, wb, sprintf("Analyzing image: %i/%i", i_image, image_count));
+        end
+    elseif nargin == 4 && ~ROI_provided % use 3
+        for i_image = 1:image_count
+            Single_Results(i_image,:) = SPACE_single(X_mask_list{i_image}, Y_mask_list{i_image}, [], pixel_size_list(i_image));
+            waitbar(i_image/image_count, wb, sprintf("Analyzing image: %i/%i", i_image, image_count));
+        end
+    else % use 4
+        for i_image = 1:image_count
+            Single_Results(i_image,:) = SPACE_single(X_mask_list{i_image}, Y_mask_list{i_image}, ROI_mask_list{i_image}, pixel_size_list(i_image));
+            waitbar(i_image/image_count, wb, sprintf("Analyzing image: %i/%i", i_image, image_count));
+        end
     end
     close(wb);
 

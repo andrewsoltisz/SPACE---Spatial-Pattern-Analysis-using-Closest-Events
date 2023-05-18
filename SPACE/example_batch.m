@@ -14,7 +14,7 @@
 % Spatial Pattern Analysis using Closest Events (SPACE)
 % Author: Andrew M. Soltisz
 % Email: andysoltisz@gmail.com
-% Last Updated: 05/11/2023
+% Last Updated: 05/18/2023
 
 %% Prepare environment
 
@@ -35,10 +35,15 @@ example_data = [example_data,filesep];
 load([example_data, 'X_mask_list.mat']);
 load([example_data, 'Y_mask_list.mat']);
 load([example_data, 'ROI_mask_list.mat']);
+n_images = numel(X_mask_list);
 
 %% Batch image SPACE analysis
 
-[Batch_Results, Single_Results] = SPACE(X_mask_list, Y_mask_list, ROI_mask_list);
+% Different use cases are listed below, un-comment one at a time
+[Single_Results, Batch_Results] = SPACE(X_mask_list, Y_mask_list); % default ROI is full image
+% [Single_Results, Batch_Results] = SPACE(X_mask_list, Y_mask_list, ROI_mask_list); % specify ROI
+% [Single_Results, Batch_Results] = SPACE(X_mask_list, Y_mask_list, [], repelem(0.2,n_images,1)); % no ROI but pixel size of 0.2um is specified, input ROI as empty matrix
+% [Single_Results, Batch_Results] = SPACE(X_mask_list, Y_mask_list, ROI_mask_list, repelem(0.2,n_images,1)); % Both ROI and pixel size of 0.2um are specified
 
 %% Plot Results
 

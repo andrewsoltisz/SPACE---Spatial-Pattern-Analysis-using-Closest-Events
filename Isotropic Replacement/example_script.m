@@ -1,5 +1,5 @@
 % Example script illustrating how to use the isotropic_replacement.m
-% function to correct spatial anisotropy in images. 
+% function to correct spatial anisotropy in images
 %
 % Author: Andrew M. Soltisz
 % Email: andysoltisz@gmail.com
@@ -58,7 +58,8 @@ title("Correct Isotropic Masks");
 % mask. Otherwise, additional pixels will be included in the analysis and
 % your sample size will be artificially increased.
 
-Results = SPACE(mask_channel1_isotropic, mask_channel2_isotropic, ROI_mask_isotropic);
+pixel_size_isotropic = image_calibration_new(1);
+Results = SPACE(mask_channel1_isotropic, mask_channel2_isotropic, ROI_mask_isotropic, pixel_size_isotropic);
 
 %% Plot Results
 
@@ -126,4 +127,3 @@ ylim([-1, 1])
 yticks(-1:0.25:1);
 grid on;
 hold off;
-

@@ -159,7 +159,7 @@ function [Results] = SPACE_single(X_mask, Y_mask, ROI_mask, pixel_size)
     [Results.XY_Random_x{1}, Results.XY_Random_PDF_y{1}] = epdf(XY_Random_NN_Distances); % compute random PDF
     Results.XY_Observed_CDF_y{1} = pdf2cdf(Results.XY_Observed_PDF_y{1}); % compute observed CDF
     Results.XY_Random_CDF_y{1} = pdf2cdf(Results.XY_Random_PDF_y{1}); % compute random CDF
-    [Results.XY_Delta_CDF_x{1}, Results.XY_Delta_CDF_y{1}, Results.XY_Spatial_Association_Index, Results.XY_Spatial_Assocation_pValue] = CSRtest_single(Results.XY_Observed_x{1}, Results.XY_Observed_PDF_y{1}, Results.XY_Observed_Event_Count, Results.XY_Random_x{1}, Results.XY_Random_PDF_y{1}, Results.XY_Random_Event_Count); % compare observed and random CDFs
+    [Results.XY_Delta_CDF_x{1}, Results.XY_Delta_CDF_y{1}, Results.XY_Spatial_Association_Index, Results.XY_Spatial_Association_pValue] = CSRtest_single(Results.XY_Observed_x{1}, Results.XY_Observed_PDF_y{1}, Results.XY_Observed_Event_Count, Results.XY_Random_x{1}, Results.XY_Random_PDF_y{1}, Results.XY_Random_Event_Count); % compare observed and random CDFs
 
     % Characterize the spatial relationship of Y relative to X (Y-->X)
     X_dt = bwdist(X_mask) * pixel_size; % distance transformation of X's mask
@@ -171,7 +171,7 @@ function [Results] = SPACE_single(X_mask, Y_mask, ROI_mask, pixel_size)
     [Results.YX_Random_x{1}, Results.YX_Random_PDF_y{1}] = epdf(YX_Random_NN_Distances); % compute random PDF
     Results.YX_Observed_CDF_y{1} = pdf2cdf(Results.YX_Observed_PDF_y{1}); % compute observed CDF
     Results.YX_Random_CDF_y{1} = pdf2cdf(Results.YX_Random_PDF_y{1}); % compute random CDF
-    [Results.YX_Delta_CDF_x{1}, Results.YX_Delta_CDF_y{1}, Results.YX_Spatial_Association_Index, Results.YX_Spatial_Assocation_pValue] = CSRtest_single(Results.YX_Observed_x{1}, Results.YX_Observed_PDF_y{1}, Results.YX_Observed_Event_Count, Results.YX_Random_x{1}, Results.YX_Random_PDF_y{1}, Results.YX_Random_Event_Count); % compare observed and random CDFs
+    [Results.YX_Delta_CDF_x{1}, Results.YX_Delta_CDF_y{1}, Results.YX_Spatial_Association_Index, Results.YX_Spatial_Association_pValue] = CSRtest_single(Results.YX_Observed_x{1}, Results.YX_Observed_PDF_y{1}, Results.YX_Observed_Event_Count, Results.YX_Random_x{1}, Results.YX_Random_PDF_y{1}, Results.YX_Random_Event_Count); % compare observed and random CDFs
 
 end
 
@@ -200,7 +200,7 @@ function [pdf_x, pdf_y] = epdf(distances, weight)
 
 end
 
-function [delta_cdf_x, delta_cdf_y, spatial_assocation_index, p_value, verdict] = CSRtest_single(obs_pdf_x, obs_pdf_y, obs_n, ran_pdf_x, ran_pdf_y, ran_n, alpha)
+function [delta_cdf_x, delta_cdf_y, spatial_association_index, p_value, verdict] = CSRtest_single(obs_pdf_x, obs_pdf_y, obs_n, ran_pdf_x, ran_pdf_y, ran_n, alpha)
 % Test for complete spatial randomness (CSR) between 2 point patterns
 % captured within a single image by comparing the observed
 % (obs_pdf_x,obs_pdf_y) and random (ran_pdf_x,ran_pdf_y) distributions
@@ -241,7 +241,7 @@ function [delta_cdf_x, delta_cdf_y, spatial_assocation_index, p_value, verdict] 
     % Compute the test statistic
     delta_cdf_y = obs_cdf_y - ran_cdf_y;
     [ks_p, ks_idx] = max(abs(delta_cdf_y));
-    spatial_assocation_index = delta_cdf_y(ks_idx);
+    spatial_association_index = delta_cdf_y(ks_idx);
     
     % Compute the asymptotic P-value approximation and accept or reject the
     % null hypothesis on the basis of the P-value (based on code found in

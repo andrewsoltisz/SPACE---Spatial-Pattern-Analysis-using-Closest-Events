@@ -12,4 +12,4 @@ Acknowledgements: Rengasayee Veeraraghavan, Seth H. Weinberg, Peter F. Craigmile
 
 Publication: This tool is described in more detail in [reference TBA] 
 
-Extras: SPACE code can also be found at https://www.mathworks.com/matlabcentral/fileexchange/129464-space-spatial-pattern-analysis-using-closest-events
+Extras: Additional SPACE documentation can be found at https://www.mathworks.com/matlabcentral/fileexchange/129464-space-spatial-pattern-analysis-using-closest-events

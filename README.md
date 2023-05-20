@@ -14,4 +14,4 @@ Primary Publication: This tool is described in more detail in [reference TBA]
 
 Extras: Additional SPACE documentation can be found at https://www.mathworks.com/matlabcentral/fileexchange/129464-space-spatial-pattern-analysis-using-closest-events
 
-References: This tool leverages nearest neighor distribution functions (G- and F-functions) from the point pattern analysis paradigm. The underlying theory is described in https://doi.org/10.1002/9780470057339.van007.
+Theory: This tool leverages bivariate nearest neighor distribution functions (G- and F-functions) from the point pattern analysis paradigm. The underlying theory is described in https://doi.org/10.1002/9780470057339.van007.

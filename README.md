@@ -5,7 +5,7 @@
 **Isotropic Replacement** - Correct spatial anisotropy of images (different resolution in x/y/z) without altering signal sample size or morphology.  
 **Synthetic Image Generation** - Generate synthetic dual-channel masks whose spatial relatiosnhip can be tuned with a single input parameter.  
 
-## Authorship  
+## Authorship:  
 **Author**: Andrew M. Soltisz  
 **Contact**: andysoltisz@gmail.com  
 **LinkedIn**: https://www.linkedin.com/in/andrew-soltisz/  

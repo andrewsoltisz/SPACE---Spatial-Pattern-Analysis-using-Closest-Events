@@ -7,6 +7,7 @@ Statistically characterize the spatial relationship between 2 image components u
 **Contact**: andysoltisz@gmail.com  
 **LinkedIn**: https://www.linkedin.com/in/andrew-soltisz/  
 **Acknowledgements**: Rengasayee Veeraraghavan, Seth H. Weinberg, Peter F. Craigmile  
+**Publication**: This work is described in more detail at https://doi.org/10.1101/2023.05.17.541131  
 **Theory**: SPACE leverages bivariate nearest neighor distribution functions (G- and F-functions) from the point pattern analysis paradigm. The underlying theory is described in https://doi.org/10.1002/9780470057339.van007.  
 
  

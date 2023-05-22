@@ -2,6 +2,7 @@
 **Author**: Andrew M. Soltisz  
 **Contact**: andysoltisz@gmail.com  
 **LinkedIn**: https://www.linkedin.com/in/andrew-soltisz/  
+**Publication**: This work is described in more detail at https://doi.org/10.1101/2023.05.17.541131  
 
 
 ## Description:  

@@ -1,6 +1,6 @@
 # SPACE---Spatial-Pattern-Analysis-using-Closest-Events
 
-Content: 
+## Content: 
 SPACE - Statistically characterize the spatial relationship between 2 image components using point pattern analysis. 
 Isotropic Replacement - Correct spatial anisotropy of images (different resolution in x/y/z) without altering signal sample size or morphology.
 Synthetic Image Generation - Generate synthetic dual-channel masks whose spatial relatiosnhip can be tuned with a single input parameter.

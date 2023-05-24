@@ -1,13 +1,10 @@
-function [p, h] = ttest2w(x, y, n_x, n_y, alpha)
+function [p, h] = ttest2w(x, y, w_x, w_y, alpha)
 % Compare means of samples x and y using the 2-sided Student's T-test with
-% weighted measurements according to their sample sizes n_x and n_y.
+% weighted measurements according to their sample sizes w_x and w_y.
 %
 % The weighted ttest is computed the same as MATLAB's built-in function
 % 'ttest2', but the weighted mean and variance are used in place of their
 % unweighted counterparts.
-%
-% Reference:
-% https://support.sas.com/documentation/onlinedoc/stat/131/ttest.pdf
 %
 % Spatial Pattern Analysis using Closest Events (SPACE)
 % Author: Andrew M. Soltisz
@@ -25,29 +22,23 @@ end
 % convert to column vector
 x = x(:);
 y = y(:);
-n_x = n_x(:);
-n_y = n_y(:);
+w_x = w_x(:);
+w_y = w_y(:);
 
 % degrees of freedom (df)
-sz_x = numel(x);
-sz_y = numel(y);
-dfe = sz_x + sz_y - 2;
-
-% weighted mean
-mu_w = @(a, n) sum(a .* n) / sum(n);
-mu_w_x = mu_w(x, n_x);
-mu_w_y = mu_w(y, n_y);
+n_x = numel(x);
+n_y = numel(y);
+dfe = n_x + n_y - 2;
 
 % weighted variance
-var_w = @(a, w, n, mu_w) sum(n.*((a - mu_w).^2)) / (n - 1);
-var_w_x = var_w(x, n_x, sz_x, mu_w_x);
-var_w_y = var_w(y, n_y, sz_y, mu_w_y);
-difference = mu_w_x - mu_w_y;
+[var_w_x, mu_w_x] = var(x, w_x);
+[var_w_y, mu_w_y] = var(y, w_y);
+mu_difference = mu_w_x - mu_w_y;
 
 % Calculate p-value (based on code found in built-in ttest2)
-sPooled = sqrt(((sz_x - 1) .* var_w_x + (sz_y - 1) .* var_w_y) ./ dfe);
-se = sPooled .* sqrt((1 ./ sz_x) + (1 ./ sz_y));
-ratio = difference ./ se;
+sPooled = sqrt(((n_x - 1) .* var_w_x + (n_y - 1) .* var_w_y) ./ dfe);
+se = sPooled .* sqrt((1 ./ n_x) + (1 ./ n_y));
+ratio = mu_difference ./ se;
 p = 2 * tcdf(-abs(ratio), dfe);
 h = cast(p <= alpha, 'like', p);
 h(isnan(p)) = NaN; 

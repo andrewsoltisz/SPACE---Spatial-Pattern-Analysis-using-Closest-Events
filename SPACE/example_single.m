@@ -36,9 +36,9 @@ ROI_mask = imread([example_data, 'ROI_mask.tif']);
 
 % different use cases are listed below, un-comment one at a time
 % Results = SPACE(X_mask, Y_mask); % default ROI is full image
-% Results = SPACE(X_mask, Y_mask, ROI_mask); % specify ROI
+Results = SPACE(X_mask, Y_mask, ROI_mask); % specify ROI
 % Results = SPACE(X_mask, Y_mask, [], 0.2); % no ROI but pixel size of 0.2um is specified, input ROI as empty matrix
-Results = SPACE(X_mask, Y_mask, ROI_mask, 0.2); % Both ROI and pixel size of 0.2um are specified
+% Results = SPACE(X_mask, Y_mask, ROI_mask, 0.2); % Both ROI and pixel size of 0.2um are specified
 
 %% Plot Results
 
@@ -57,6 +57,7 @@ nexttile;
 XY_mask_color = gen_overlay(X_mask,Y_mask);
 imshow(imresize(XY_mask_color,4,'nearest'));
 title("Combined Mask");
+sgtitle("Image with Aggregated Patterns");
 
 % create 1 figure with subplots for each plot
 figure;
@@ -121,4 +122,22 @@ ylabel("\DeltaP");
 ylim([-1, 1])
 yticks(-1:0.25:1);
 grid on;
+hold off;
+
+%% Phase Diagram of Spatial Association Indices
+
+figure;
+hold on;
+plot([-1, 1], [0, 0], 'k'); % plot black line across x-axis to highlight y=0
+plot([0, 0], [-1, 1], 'k'); % plot black line across x-axis to highlight x=0
+scatter(Results.XY_Spatial_Association_Index,Results.YX_Spatial_Association_Index,100,'filled','markeredgecolor','k'); % aggregated
+title("Spatial Association Index Phase Diagram");
+xlabel("X\rightarrowY Spatial Association");
+xlim([-1, 1]);
+xticks(-1:0.25:1);
+ylabel("Y\rightarrowX Spatial Association");
+ylim([-1, 1]);
+yticks(-1:0.25:1);
+grid on;
+axis square;
 hold off;

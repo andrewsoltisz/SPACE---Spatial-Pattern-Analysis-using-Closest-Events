@@ -59,10 +59,10 @@ imshow(imresize(mask2_color,4,'nearest'));
 nexttile;
 mask3_color = gen_overlay(X_mask_list{3},Y_mask_list{3});
 imshow(imresize(mask3_color,4,'nearest'));
-sgtitle(f,"Representative Images");
+sgtitle(f,"Representative Images with Dispersed Patterns");
 
 figure;
-sgtitle("Batch Image SPACE Results");
+sgtitle("Batch SPACE Results");
 X_color = 'r';
 Y_color = 'g';
 xmax = max([Batch_Results.XY_Global_x{1}(end), Batch_Results.XY_Global_x{1}(end)]); % ensure common x-limit for all plots
@@ -137,4 +137,22 @@ ylabel("\DeltaP", 'FontAngle', 'italic');
 ylim([-1, 1]);
 yticks(-1:0.25:1);
 grid on;
+hold off;
+
+%% Phase Diagram of Spatial Association Indices
+
+figure;
+hold on;
+plot([-1, 1], [0, 0], 'k'); % plot black line across x-axis to highlight y=0
+plot([0, 0], [-1, 1], 'k'); % plot black line across x-axis to highlight x=0
+scatter(Batch_Results.XY_Sample_Spatial_Association_Index{1}, Batch_Results.YX_Sample_Spatial_Association_Index{1},'filled','markeredgecolor','k'); % dispersed
+title("Spatial Association Index Phase Diagram");
+xlabel("X\rightarrowY Spatial Association");
+xlim([-1, 1]);
+xticks(-1:0.25:1);
+ylabel("Y\rightarrowX Spatial Association");
+ylim([-1, 1]);
+yticks(-1:0.25:1);
+grid on;
+axis square;
 hold off;

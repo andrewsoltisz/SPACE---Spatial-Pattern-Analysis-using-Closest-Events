@@ -94,13 +94,13 @@ function [isotropic_mask, isotropic_ROI, calibration_new] = isotropic_replacemen
 
     % Calculate new isotropic pixel size if none provided
     if nargin == 3
-        min_cal = min(calibration_old);
-        max_cal = max(calibration_old);
-        root3dim = max_cal / sqrt(3);
-        if min_cal <= root3dim
+        [min_cal, min_idx] = min(calibration_old);
+        [max_cal, max_idx] = max(calibration_old);
+        sqrt3_cal = calibration_old / sqrt(3);
+        if min_cal <= sqrt3_cal(max_idx) % no error introduced to min_cal dimensions, all other error is sub-resolution
             isotropic_distance = min_cal;
-        else
-            isotropic_distance = root3dim;
+        else 
+            isotropic_distance = sqrt3_cal(min_idx);
         end
         calibration_new = repelem(isotropic_distance,numel(calibration_old));
     elseif nargin == 4

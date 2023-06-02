@@ -49,7 +49,7 @@ combined_mask(:,:,:,1) = mask_channel1_isotropic * 255;
 combined_mask(:,:,:,2) = mask_channel2_isotropic * 255;
 figure;
 sliceViewer(combined_mask);
-title("Correct Isotropic Masks");
+title("Corrected Isotropic Masks");
 
 %% Perform SPACE with corrected images
 

@@ -23,7 +23,13 @@ function [Y_im, X_im, Y_n, X_n] = gen_synthetic_masks(im_sz, X_conc, Y_conc, S, 
 % Spatial Pattern Analysis using Closest Events (SPACE)
 % Author: Andrew M. Soltisz
 % Email: andysoltisz@gmail.com
-% Last Updated: 05/11/2023
+% GitHub: https://github.com/andrewsoltisz/SPACE---Spatial-Pattern-Analysis-using-Closest-Events
+% Publication: https://doi.org/10.1101/2023.05.17.541131
+% Last Updated: 10/05/2023
+%
+% Copyright (C) 2023, Andrew Michael Soltisz. All rights reserved.
+% This source code is licensed under the BSD-3-Clause License found in the
+% LICENSE.txt file in the root directory of this source tree.
 
     im_n_pixels = prod(im_sz); % calculate total number of pixels in the image
     

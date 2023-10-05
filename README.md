@@ -16,4 +16,8 @@
 **LinkedIn**: https://www.linkedin.com/in/andrew-soltisz/  
 **Acknowledgements**: [Rengasayee Veeraraghavan](https://scholar.google.com/citations?user=Cplzy0sAAAAJ&hl=en), [Seth H. Weinberg](https://scholar.google.com/citations?user=ZIEaW3wAAAAJ&hl=en), [Peter F. Craigmile](https://scholar.google.com/citations?user=nFsOwZEAAAAJ&hl=en)  
 **Primary Publication**: This work is described in more detail at https://doi.org/10.1101/2023.05.17.541131   
-**Extras**: Additional SPACE documentation can be found at https://www.mathworks.com/matlabcentral/fileexchange/129464-space-spatial-pattern-analysis-using-closest-events
+**Extras**: Additional SPACE documentation can be found at https://www.mathworks.com/matlabcentral/fileexchange/129464-space-spatial-pattern-analysis-using-closest-events  
+
+Copyright (C) 2023, Andrew Michael Soltisz.  
+All rights reserved.   
+The source code within this directory is licensed under the BSD-3-Clause License found in the LICENSE.txt file.

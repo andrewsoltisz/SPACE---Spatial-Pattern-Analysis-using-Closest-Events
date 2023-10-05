@@ -8,7 +8,13 @@ function [line_plot, shaded_error] = plot_error(x, y, error_lower, error_upper)
 % Spatial Pattern Analysis using Closest Events (SPACE)
 % Author: Andrew M. Soltisz
 % Email: andysoltisz@gmail.com
-% Last Updated: 05/17/2023
+% GitHub: https://github.com/andrewsoltisz/SPACE---Spatial-Pattern-Analysis-using-Closest-Events
+% Publication: https://doi.org/10.1101/2023.05.17.541131
+% Last Updated: 10/05/2023
+%
+% Copyright (C) 2023, Andrew Michael Soltisz. All rights reserved.
+% This source code is licensed under the BSD-3-Clause License found in the
+% LICENSE.txt file in the root directory of this source tree.
 
     % Input validation
     if nargin < 4

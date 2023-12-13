@@ -147,7 +147,7 @@ end
 function [isotropic_mask, isotropic_indices] = replace_pixels(replacement_indices, isotropic_mask, anisotropic_mask)
 % Given isotropic indices for every pixel in the original image
 % (replacement_indices), place the true values from the anisotropic_mask
-% into the pixels of isotropic_mask closest to their origina (real-world)
+% into the pixels of isotropic_mask closest to their original (real-world)
 % positions.
 % 
 % Author: Andrew M. Soltisz

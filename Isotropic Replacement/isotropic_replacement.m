@@ -6,7 +6,7 @@ function [isotropic_mask, isotropic_ROI, calibration_new] = isotropic_replacemen
 % (real-world) position most closely matches the position of the original
 % pixels. Specify the original pixel size (length-units per pixel) via the
 % calibration_old input, and specify the desired new pixel size via the
-% (optional) calibration_new inpit. In no new calibration is specified, a
+% (optional) calibration_new input. In no new calibration is specified, a
 % default size will be used as either the smallest of the original
 % calibration values or the largest divided by root-3, whichever value is
 % smaller. Input images must be masks in the form of logical matrices. If

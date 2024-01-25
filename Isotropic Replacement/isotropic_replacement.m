@@ -12,9 +12,10 @@ function [isotropic_mask, isotropic_ROI, calibration_new] = isotropic_replacemen
 % smaller. Input images must be masks in the form of logical matrices. If
 % correcting mutliple images, input a cell array of logical matrices. The
 % corrected image(s) will be output in the same format as the input (cell
-% array of logical matrices VS logical matric). You can specify the
-% desired. ROI mask must be provided because it is necessary for subsequent
-% analyses.
+% array of logical matrices VS logical matric). The ROI mask must be 
+% provided because it is necessary for subsequent analyses. This mask 
+% indicates all the pixels which compoes the field of view (study area)
+% over which all subsequent analyses will be performed.
 % 
 % Author: Andrew M. Soltisz
 % Email: andysoltisz@gmail.com

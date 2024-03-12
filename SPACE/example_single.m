@@ -102,7 +102,7 @@ yticks(0:0.2:1);
 grid on;
 hold off;
 
-% X-->Y CDFs
+% X-->Y Delta CDFs
 subplot(2,2,3);
 hold on
 plot([0,xmax], [0,0], 'k'); % plot y=0 to highlight x-axis
@@ -116,7 +116,7 @@ yticks(-1:0.25:1);
 grid on;
 hold off;
 
-% X-->Y CDFs
+% X-->Y Delta CDFs
 subplot(2,2,4);
 hold on
 plot([0,xmax], [0,0], 'k'); % plot y=0 to highlight x-axis

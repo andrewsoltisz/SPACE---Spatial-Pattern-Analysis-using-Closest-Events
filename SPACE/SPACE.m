@@ -48,12 +48,16 @@ function [varargout] = SPACE(X_mask, Y_mask, ROI_mask, pixel_size)
 % See readme documentation for a detailed description of the output table
 % fields.
 %
-% Spatial Pattern Analysis using Closest Events (SPACE)
+% Title: Spatial Pattern Analysis using Closest Events (SPACE)
+% Citation: Andrew M Soltisz, Peter F Craigmile, Rengasayee Veeraraghavan.
+%           Spatial Pattern Analysis using Closest Events (SPACE)—A Nearest Neighbor
+%           Point Pattern Analysis Framework for Assessing Spatial Relationships from
+%           Digital Images. Microscopy and Microanalysis, 2024, ozae022,
+%           https://doi.org/10.1093/mam/ozae022.
 % Author: Andrew M. Soltisz
 % Email: andysoltisz@gmail.com
 % GitHub: https://github.com/andrewsoltisz/SPACE---Spatial-Pattern-Analysis-using-Closest-Events
-% Publication: https://doi.org/10.1101/2023.05.17.541131
-% Last Updated: 10/05/2023
+% Last Updated: 03/18/2024
 %
 % Copyright (C) 2023, Andrew Michael Soltisz. All rights reserved.
 % This source code is licensed under the BSD-3-Clause License found in the

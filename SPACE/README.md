@@ -3,11 +3,11 @@ Statistically characterize the spatial relationship between 2 image components u
 
 ## Authorship:  
 **Title**: SPACE - Spatial Pattern Analysis using Closest Events  
+**Citation**: Andrew M Soltisz, Peter F Craigmile, Rengasayee Veeraraghavan. Spatial Pattern Analysis using Closest Events (SPACE)—A Nearest Neighbor Point Pattern Analysis Framework for Assessing Spatial Relationships from Digital Images. Microscopy and Microanalysis, 2024, ozae022. https://doi.org/10.1093/mam/ozae022.  
 **Author**: Andrew M. Soltisz  
 **Contact**: andysoltisz@gmail.com  
 **LinkedIn**: https://www.linkedin.com/in/andrew-soltisz/  
 **Acknowledgements**: Rengasayee Veeraraghavan, Seth H. Weinberg, Peter F. Craigmile  
-**Publication**: This work is described in more detail at https://doi.org/10.1101/2023.05.17.541131  
 **Theory**: SPACE leverages bivariate nearest neighor distribution functions (G- and F-functions) from the point pattern analysis paradigm. The underlying theory is described in https://doi.org/10.1002/9780470057339.van007.  
 
 Copyright (C) 2023, Andrew Michael Soltisz.  

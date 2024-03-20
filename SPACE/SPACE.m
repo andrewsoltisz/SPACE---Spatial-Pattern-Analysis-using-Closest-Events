@@ -59,7 +59,7 @@ function [varargout] = SPACE(X_mask, Y_mask, ROI_mask, pixel_size)
 % GitHub: https://github.com/andrewsoltisz/SPACE---Spatial-Pattern-Analysis-using-Closest-Events
 % Last Updated: 03/18/2024
 %
-% Copyright (C) 2023, Andrew Michael Soltisz. All rights reserved.
+% Copyright (C) 2024, Andrew Michael Soltisz. All rights reserved.
 % This source code is licensed under the BSD-3-Clause License found in the
 % LICENSE.txt file in the root directory of this source tree.
 

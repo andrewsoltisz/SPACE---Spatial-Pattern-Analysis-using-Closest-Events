@@ -10,7 +10,7 @@ Statistically characterize the spatial relationship between 2 image components u
 **Acknowledgements**: Rengasayee Veeraraghavan, Seth H. Weinberg, Peter F. Craigmile  
 **Theory**: SPACE leverages bivariate nearest neighor distribution functions (G- and F-functions) from the point pattern analysis paradigm. The underlying theory is described in https://doi.org/10.1002/9780470057339.van007.  
 
-Copyright (C) 2023, Andrew Michael Soltisz.  
+Copyright (C) 2024, Andrew Michael Soltisz.  
 All rights reserved.   
 The source code within this directory is licensed under the BSD-3-Clause License found in the LICENSE.txt file.
 

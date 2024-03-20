@@ -4,7 +4,7 @@
 **LinkedIn**: https://www.linkedin.com/in/andrew-soltisz/  
 **Publication**: This work is described in more detail at https://doi.org/10.1101/2023.05.17.541131  
 
-Copyright (C) 2023, Andrew Michael Soltisz.  
+Copyright (C) 2024, Andrew Michael Soltisz.  
 All rights reserved.   
 The source code within this directory is licensed under the BSD-3-Clause License found in the LICENSE.txt file.
 

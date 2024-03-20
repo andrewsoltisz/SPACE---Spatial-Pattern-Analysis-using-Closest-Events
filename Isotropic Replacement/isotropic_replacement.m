@@ -20,7 +20,7 @@ function [isotropic_mask, isotropic_ROI, calibration_new] = isotropic_replacemen
 % Author: Andrew M. Soltisz
 % Email: andysoltisz@gmail.com
 % GitHub: https://github.com/andrewsoltisz/SPACE---Spatial-Pattern-Analysis-using-Closest-Events
-% Publication: https://doi.org/10.1101/2023.05.17.541131
+% Publication: https://doi.org/10.1093/mam/ozae022
 % Last Updated: 10/05/2023
 %
 % Copyright (C) 2024, Andrew Michael Soltisz. All rights reserved.

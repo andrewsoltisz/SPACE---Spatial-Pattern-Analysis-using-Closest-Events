@@ -23,7 +23,7 @@ function [isotropic_mask, isotropic_ROI, calibration_new] = isotropic_replacemen
 % Publication: https://doi.org/10.1101/2023.05.17.541131
 % Last Updated: 10/05/2023
 %
-% Copyright (C) 2023, Andrew Michael Soltisz. All rights reserved.
+% Copyright (C) 2024, Andrew Michael Soltisz. All rights reserved.
 % This source code is licensed under the BSD-3-Clause License found in the
 % LICENSE.txt file in the root directory of this source tree.
 

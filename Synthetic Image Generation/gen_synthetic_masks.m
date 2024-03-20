@@ -24,10 +24,10 @@ function [Y_im, X_im, Y_n, X_n] = gen_synthetic_masks(im_sz, X_conc, Y_conc, S, 
 % Author: Andrew M. Soltisz
 % Email: andysoltisz@gmail.com
 % GitHub: https://github.com/andrewsoltisz/SPACE---Spatial-Pattern-Analysis-using-Closest-Events
-% Publication: https://doi.org/10.1101/2023.05.17.541131
+% Publication: https://doi.org/10.1093/mam/ozae022
 % Last Updated: 10/05/2023
 %
-% Copyright (C) 2023, Andrew Michael Soltisz. All rights reserved.
+% Copyright (C) 2024, Andrew Michael Soltisz. All rights reserved.
 % This source code is licensed under the BSD-3-Clause License found in the
 % LICENSE.txt file in the root directory of this source tree.
 

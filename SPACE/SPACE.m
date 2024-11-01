@@ -1,25 +1,119 @@
 function [varargout] = SPACE(X_mask, Y_mask, ROI_mask, pixel_size)
-% Main function for performing 'Spatial Pattern Analysis using Closest
-% Events' (SPACE) to characterize the spatial association between imaged
-% patterns X and Y whose events are indicated by the 'true' pixels in their
-% corresponding masks X_mask and Y_mask. All masks should be input as
-% logical matrices. To analyze multiple images, input cell arrays of
-% pattern masks. (Optional) For subregion analysis, input a third mask
-% which specifies a region-of-interest (ROI) within the image(s) indicated
-% by the 'true' pixels in ROI_mask. (Optional) If pixels have a real-world
-% size, provide the pixel(s) side-length as a fourth input to scale
-% distances accordingly - input an array of sizes for multiple image
-% analysis. If performing single image analysis, the results will be output
-% as a single-row table with columns corresponding to the various
-% single-image SPACE analysis results. If performing batch image analysis,
-% the batch results will be the second output in the form of a single-row
-% table with columns correspond to the varius SPACE batch analysis result,
-% and the first output will be the single-image analysis results for each
-% image in the batch in the form of a mutli-row table with rows correspind
-% to each image and columns corresponding to the various single-image SPACE
-% analysis results.
+% Perform 'Spatial Pattern Analysis using Closest Events' (SPACE), a
+% discrete, nearest neighbor-based point patten analysis which
+% characterizes the spatial association between imaged patterns X and Y
+% whose events are marked by the 'true' pixels in their corresponding
+% binary image masks 'X_mask' and 'Y_mask'. Multiple sets of mask images
+% can be analyzed with a single function call to SPACE by formatting
+% 'X_mask' and 'Y_mask' as cell arrays of masks - see input descriptions
+% below for more details.
+% 
+% -------------------------------------------------------------------------
 %
-% USE CASES:
+% INPUTS:
+%
+% 1. X_mask - Binary image (mask) identifying the first signal or type of
+%             objects to localize relative to the second signal represented
+%             by 'Y_mask'. Here, elements with a value of 1 (or TRUE)
+%             indicate pixels containing signal and elements with a value
+%             of 0 (or FALSE) indicate background pixels. When analyzing
+%             just a single pair of masks (one analysis), format as a
+%             logical matrix of any dimensionality with the same size and
+%             shape as 'Y_mask'. To analyze multiple pairs of masks
+%             (multiple analyses) with one function call to SPACE, format
+%             as a cell array of logical matrices with the same number of
+%             elements as 'Y_mask', where matrices in the corresponding
+%             elements to 'Y_mask' have the same size and shape.
+%
+% 2. Y_mask - Binary image (mask) identifying the second signal or type of
+%             objects to localize relative to the first signal represented
+%             by 'X_mask'. Here, elements with a value of 1 (or TRUE)
+%             indicate pixels containing signal and elements with a value
+%             of 0 (or FALSE) indicate background pixels. When analyzing
+%             just a single pair of masks (one analysis), format as a
+%             logical matrix of any dimensionality with the same size and
+%             shape as 'X_mask'. To analyze multiple pairs of masks with
+%             one function call to SPACE, format as a cell array of logical
+%             matrices with the same number of elements as 'X_mask', where
+%             matrices in corresponding elements to 'X_mask' have the same
+%             size and shape.
+%
+% 3. ROI_mask - OPTIONAL input which is a binary image (mask) identifying a
+%               region-of-interest (ROI) within the other masks where the
+%               analysis will be focused. This input is MANDATORY if
+%               'X_mask' and 'Y_mask' were first processed using Isotropic
+%               Replacement, otherwise this analyses will produce 100%
+%               garbage results. Here, elements with a value of 1 (or TRUE)
+%               indicate the pixels to include in the analysis and elements
+%               with a value of 0 (or FALSE) indicate pixels to omit from
+%               the analysis. When analyzing just a single pair of masks
+%               (one analysis), format as a logical matrix of any
+%               dimensionality with the same size and shape as 'X_mask' and
+%               'Y_mask'. To analyze multiple pairs of masks with one
+%               function call to SPACE, format as a cell array of logical
+%               matrices with the same number of elements as 'X_mask' and
+%               'Y_mask', where matrices in corresponding elements to
+%               'X_mask' and 'Y_mask' have the same size and shape.
+%
+% 4. pixel_size - OPTIONAL input which specifies the real-world size
+%                 (side-length) of pixels composing 'X_mask' and 'Y_mask'.
+%                 Formatted as a positive scalar number for single analyses
+%                 and a vector with as many elements as the mask variables
+%                 when performing multiple analyses with one function call
+%                 to SPACE. This input is used to scale SPACE results so
+%                 they have the same-real world units as the input masks.
+%                 For the SPACE analysis to produce results which are not
+%                 100% garbage, the real-world shape of mask pixels must be
+%                 cuboidal, meaning every side of the pixel is the same
+%                 length, and this length is the single value that needs to
+%                 be assigned to this fouth input. If your pixels are in
+%                 fact not cuboidal (e.g. the x/y-resolution of your masks
+%                 is different than their z-resolution), fear not! Your
+%                 just have to resample the masks so that they are
+%                 isotropic with cuboidal pixels. This can easily be done
+%                 using the Isotropic Replacement method found at the
+%                 GitHub link below. The 'isotropic_ROI mask' (2nd) output
+%                 from isotropic replacement function must then be used as
+%                 the 3rd input to this function ('ROI_mask') for the SPACE
+%                 analysis to be performed correctly.
+%
+% -------------------------------------------------------------------------
+%
+% OUTPUTS: 
+%
+% 1. Single_Results - For all use cases, this is the first ouput from SPACE
+%                     and is formatted as a table containing the results
+%                     for the SPACE analysis of each pair of input masks.
+%                     If 'X_mask' and 'Y_mask' are input as single matrices
+%                     (single analysis), then this will be formatted as
+%                     table with one row and a column for each SPACE
+%                     output. If 'X_mask' and 'Y_mask' are input as cell
+%                     arrays of matrices (multiple analysis with one
+%                     function call), then this will be formatted as a
+%                     table where each row corresponds to the SPACE outputs
+%                     for each pair of masks, thus this table will have as
+%                     many rows as elements of the cell arrays 'X_mask' and
+%                     'Y_mask'. See the linked GitHub page for info on what
+%                     each column represents.
+%
+% 2. Batch_Results - This is the second output from SPACE and is only
+%                    produced when performing multiple analyses with one
+%                    function call to SPACE (when 'X_mask' and 'Y_mask' are
+%                    input as cell arrays of matrices). Formatted as a
+%                    table containing the summary results describing the
+%                    aggregate analysis of all pairs of masks. This table
+%                    contains fundamentally different information than
+%                    'Single_Results' - See the linked GitHub page for info
+%                    on what each column represents. If you are using SPACE
+%                    to perform multiple pair-wise comparisons between
+%                    different groups of mask sets, you could theoretically
+%                    call SPACE in a for loop and append batch results from
+%                    each multi-mask analysis to this table as a
+%                    programmatic way to organize your data.
+%
+% -------------------------------------------------------------------------
+%
+% USES CASES:
 % 
 % [...] = SPACE(X_mask, Y_mask) perform analysis without specifiying an
 % ROI or pixel size. Here, the ROI is treated as the entire image and the
@@ -45,8 +139,9 @@ function [varargout] = SPACE(X_mask, Y_mask, ROI_mask, pixel_size)
 % batch-image results which describes the aggregated behavior of the image
 % collection. 
 %
-% See readme documentation for a detailed description of the output table
-% fields.
+% -------------------------------------------------------------------------
+%
+% AUTHORSHIP:
 %
 % Title: Spatial Pattern Analysis using Closest Events (SPACE)
 % Citation: Andrew M Soltisz, Peter F Craigmile, Rengasayee Veeraraghavan.
@@ -57,11 +152,13 @@ function [varargout] = SPACE(X_mask, Y_mask, ROI_mask, pixel_size)
 % Author: Andrew M. Soltisz
 % Email: andysoltisz@gmail.com
 % GitHub: https://github.com/andrewsoltisz/SPACE---Spatial-Pattern-Analysis-using-Closest-Events
-% Last Updated: 03/18/2024
+% Last Updated: 03/20/2024
 %
-% Copyright (C) 2024, Andrew Michael Soltisz. All rights reserved.
+% Copyright 2024, Andrew Michael Soltisz. All rights reserved.
 % This source code is licensed under the BSD-3-Clause License found in the
 % LICENSE.txt file in the root directory of this source tree.
+%
+% -------------------------------------------------------------------------
 
     % Check for appropriate number of inputs
     if nargin < 2
@@ -149,7 +246,7 @@ function [Results] = SPACE_single(X_mask, Y_mask, ROI_mask, pixel_size)
     % Make sure pixel length 
     if nargin == 4
         if ~(isscalar(pixel_size) && isnumeric(pixel_size))
-            error("Pixel size must be a scalar number.");
+            error("Pixel size must be scalar.");
         end
     else
         pixel_size = 1; % default value
@@ -230,10 +327,10 @@ function [delta_cdf_x, delta_cdf_y, spatial_association_index, p_value, verdict]
     end
     
     % Convert to column vector to ensure consistent output format
-    obs_pdf_x =  obs_pdf_x(:);
-    obs_pdf_y =  obs_pdf_y(:);
-    ran_pdf_x  =  ran_pdf_x(:);
-    ran_pdf_y  =  ran_pdf_y(:);
+    obs_pdf_x = obs_pdf_x(:);
+    obs_pdf_y = obs_pdf_y(:);
+    ran_pdf_x = ran_pdf_x(:);
+    ran_pdf_y = ran_pdf_y(:);
 
     % Regenerate input distributions over a global x-coordinate scheme
     delta_cdf_x = unique([obs_pdf_x; ran_pdf_x]); % find common bins
@@ -258,7 +355,7 @@ function [delta_cdf_x, delta_cdf_y, spatial_association_index, p_value, verdict]
     % built-in kstest2)
     n = obs_n * ran_n / (obs_n + ran_n);
     lambda = max((sqrt(n) + 0.12 + 0.11 / sqrt(n)) * ks_p, 0);
-    p_value  =  exp(-2 * lambda * lambda);
+    p_value = exp(-2 * lambda * lambda);
     verdict = (alpha >= p_value);
 
 end

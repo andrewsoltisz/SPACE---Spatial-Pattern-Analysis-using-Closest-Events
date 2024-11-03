@@ -74,6 +74,7 @@ function [isotropic_mask, isotropic_ROI, calibration_new] = isotropic_replacemen
 %                      of the cuboidal pixels composing 'isotropic_mask'
 %                      and 'calibration_new'. Foratted as a positive
 %                      numeric scalar. 
+%
 % -------------------------------------------------------------------------
 % 
 % USE CASES: 

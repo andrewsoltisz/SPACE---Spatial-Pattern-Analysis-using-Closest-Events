@@ -1,31 +1,110 @@
 function [isotropic_mask, isotropic_ROI, calibration_new] = isotropic_replacement(anisotropic_mask, anisotropic_ROI, calibration_old, calibration_new)
-% Correct spatially anisotropic images using isotropic replacement method
-% where signal pixels are placed into an isotropic image whose overall
-% (real-world) size matches the original image but it has been subdivided
-% to make isotropic. Signal pixels are placed into new pixels whose
+% Resample spatially anisotropic images using isotropic replacement method
+% where signal (TRUE) pixels are placed into an isotropic image whose overall
+% (real-world) size matches the original input image but has been subdivided
+% to be isotropic. Signal pixels are then placed into new pixels whose
 % (real-world) position most closely matches the position of the original
-% pixels. Specify the original pixel size (length-units per pixel) via the
-% calibration_old input, and specify the desired new pixel size via the
-% (optional) calibration_new input. If no new calibration is specified, a
-% default size will be used as either the smallest of the original
-% calibration values or the largest divided by root-3, whichever value is
-% smaller. Input images must be masks in the form of logical matrices. If
-% correcting mutliple images, input a cell array of logical matrices. The
-% corrected image(s) will be output in the same format as the input (cell
-% array of logical matrices VS logical matric). The ROI mask must be 
-% provided because it is necessary for subsequent analyses. This mask 
-% indicates all the pixels which compoes the field of view (study area)
-% over which all subsequent analyses will be performed.
+% pixels. 
+% 
+% -------------------------------------------------------------------------
+% 
+% INPUTS: 
+% 
+% 1. anisotropic_mask - Binary image (mask) identifying the positions of
+%                       events or signals in the original (anisotropic)
+%                       image. Here, elements with a value of 1 (or TRUE)
+%                       indicate pixels containing signal and elements with
+%                       a value of 0 (or FALSE) indicate background pixels.
+%                       When resampling only one mask, format as a logical
+%                       matrix of any dimension with the same size and
+%                       shape as 'anisotropic_ROI'. To resample multiple
+%                       masks with one function call to
+%                       isotropic_replacement, format as a cell array of
+%                       logical matrices, where all matrices have the same
+%                       size and shape.
+%
+% 2. anisotropic_ROI - Binary image (mask) identifying a region-of-interest
+%                      (ROI) within 'anisotropic_mask' where the resampling
+%                      will be focused. This input is mandatory, but if you
+%                      don't know what it should be, just input a logical
+%                      matrix of all 1's. Here, elements with a value of 1
+%                      (or TRUE) indicate pixels containing signal and
+%                      elements with a value of 0 (or FALSE) indicate
+%                      background pixels. Formatted as a logical matrix of
+%                      any dimension with the same size and shape as the
+%                      matrix component of 'anisotropic_mask'.
+%
+% 3. calibration_old - Specifies the real-world dimensions (side-lengths)
+%                      of pixels composing 'anisotropic_mask' and
+%                      'anisotropic_ROI'. Formatted as a 1-by-d numerical
+%                      row vector where each column specifies the pixel
+%                      side-length along each dimension in the order x, y,
+%                      z, etc. All masks should have the same original
+%                      calibration, even when resampling multiple images
+%                      with one function call to isotropic_replacement.
+%
+% 4. calibration_new - OPTIONAL input speicifying the final cuboidal
+%                      side-length of the pixels which the output masks
+%                      will be resample to match. Formatted as a positive
+%                      numeric scalar that is smaller than or equal the
+%                      smallest value in 'calibration_old'. If this input
+%                      is not provided, a default value will be used that
+%                      is either the smallest value from 'calibration_old'
+%                      or the largest value from 'calibration_old' divided
+%                      by root-3, whichever value is smallest. This latter
+%                      value is chosen to ensure that any resulting errors
+%                      on pair-wise distances between pixels is less than
+%                      the lowest-resolution dimension from the original
+%                      image.
+% 
+% -------------------------------------------------------------------------
+% 
+% OUTPUTS: 
+% 
+% 1. isotropic_mask - Binary image that is a resampling of
+%                     'anisotropic_mask' such that its pixels are isotropic
+%                     or cuboidal. Formatted the same as
+%                     'anisotropic_mask'.
+%
+% 2. isotropic_ROI - Binary image that is a resampling of
+%                     'anisotropic_ROI' such that its pixels are isotropic
+%                     or cuboidal. Formatted the same as 'anisotropic_ROI'.
+%
+% 3. calibration_new - Specifies the real-world size (side-length)
+%                      of the cuboidal pixels composing 'isotropic_mask'
+%                      and 'calibration_new'. Foratted as a positive
+%                      numeric scalar. 
+% -------------------------------------------------------------------------
+% 
+% USE CASES: 
+% 
+% [...] = isotropic_replacement(anisotropic_mask, anisotropic_ROI, calibration_old)
+% perform Isotropic Replacement on 'anisotropic_mask' and
+% 'anisotropic_ROI'. The new pixel size 'calibration_new' will be
+% automatically calculated as either the smallest value from
+% 'calibration_old' or the largest value from 'calibration_old' divided by
+% root-3, whichever value is smallest.
+%
+% [...] isotropic_replacement(anisotropic_mask, anisotropic_ROI, calibration_old, calibration_new)
+% % perform Isotropic Replacement on 'anisotropic_mask' and
+% 'anisotropic_ROI'. The new pixel size 'calibration_new' will be defined
+% by user input. 
+%
+% -------------------------------------------------------------------------
+% 
+% AUTHORSHIP: 
 % 
 % Author: Andrew M. Soltisz
 % Email: andysoltisz@gmail.com
 % GitHub: https://github.com/andrewsoltisz/SPACE---Spatial-Pattern-Analysis-using-Closest-Events
-% Publication: https://doi.org/10.1093/mam/ozae022
+% Publication: https://doi.org/10.1101/2023.05.17.541131
 % Last Updated: 10/05/2023
 %
-% Copyright (C) 2024, Andrew Michael Soltisz. All rights reserved.
+% Copyright 2023, Andrew Michael Soltisz. All rights reserved.
 % This source code is licensed under the BSD-3-Clause License found in the
 % LICENSE.txt file in the root directory of this source tree.
+% 
+% -------------------------------------------------------------------------
 
     %% Input Validation
 
@@ -44,23 +123,20 @@ function [isotropic_mask, isotropic_ROI, calibration_new] = isotropic_replacemen
         if ~isrow(calibration_old)
             error("Calibration must be a row vector.");
         end
-        if ~all(size(calibration_old) == size(calibration_new))
-            error("New and old image calibrations must be the same size.");
-        end
         % make sure new calibration is isotropic
-        if numel(unique(calibration_new)) > 1
-            error("Input new calibration is not isotropic.");
+        if numel(calibration_new) > 1 || ~isnumeric(calibration_new) || calibration_new <= 0
+            error("New calibration must be a positive numeric scalar.");
         end
         % make sure new calibration is no more than old calibration
         if any(calibration_new > calibration_old)
-            error("Input new calibration must be <= old calibration.");
+            error("New calibration must be <= old calibration.");
         end
     end
 
     % check if first input is correct data types
-    is_one_image = false;
+    just_one_image = false;
     if ~iscell(anisotropic_mask)
-        is_one_image = true;
+        just_one_image = true;
         anisotropic_mask = {anisotropic_mask};
     end
     if ~all(cellfun(@islogical,anisotropic_mask))
@@ -102,16 +178,16 @@ function [isotropic_mask, isotropic_ROI, calibration_new] = isotropic_replacemen
     % Calculate new isotropic pixel size if none provided
     if nargin == 3
         [min_cal, min_idx] = min(calibration_old);
-        [max_cal, max_idx] = max(calibration_old);
+        [~, max_idx] = max(calibration_old);
         sqrt3_cal = calibration_old / sqrt(3);
         if min_cal <= sqrt3_cal(max_idx) % no error introduced to min_cal dimensions, all other error is sub-resolution
             isotropic_distance = min_cal;
         else 
             isotropic_distance = sqrt3_cal(min_idx);
         end
-        calibration_new = repelem(isotropic_distance,numel(calibration_old));
+        calibration_new = isotropic_distance;
     elseif nargin == 4
-        isotropic_distance = calibration_new(1);
+        isotropic_distance = calibration_new;
     end
 
     % Get general info
@@ -136,8 +212,8 @@ function [isotropic_mask, isotropic_ROI, calibration_new] = isotropic_replacemen
     end
     isotropic_ROI = replace_pixels(replacement_indices, isotropic_template, anisotropic_ROI);
 
-    % return subject mask to matrix if only one was provided
-    if is_one_image
+    % return subject mask to matrix data-type if only one was input
+    if just_one_image
         isotropic_mask = isotropic_mask{1};
     end
     
@@ -148,7 +224,7 @@ end
 function [isotropic_mask, isotropic_indices] = replace_pixels(replacement_indices, isotropic_mask, anisotropic_mask)
 % Given isotropic indices for every pixel in the original image
 % (replacement_indices), place the true values from the anisotropic_mask
-% into the pixels of isotropic_mask closest to their original (real-world)
+% into the pixels of isotropic_mask closest to their origina (real-world)
 % positions.
 % 
 % Author: Andrew M. Soltisz

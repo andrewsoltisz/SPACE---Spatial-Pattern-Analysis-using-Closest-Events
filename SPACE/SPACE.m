@@ -40,27 +40,31 @@ function [varargout] = SPACE(X_mask, Y_mask, ROI_mask, pixel_size)
 %
 % 3. ROI_mask - OPTIONAL input which is a binary image (mask) identifying a
 %               region-of-interest (ROI) within the other masks where the
-%               analysis will be focused. This input is MANDATORY if
-%               'X_mask' and 'Y_mask' were first processed using Isotropic
-%               Replacement, otherwise this analyses will produce 100%
-%               garbage results. Here, elements with a value of 1 (or TRUE)
-%               indicate the pixels to include in the analysis and elements
-%               with a value of 0 (or FALSE) indicate pixels to omit from
-%               the analysis. When analyzing just a single pair of masks
-%               (one analysis), format as a logical matrix of any
+%               analysis will be focused. If this is not provided or is
+%               assigned the value of an empty matrix, then the intire mask
+%               will be analyzed. Here, elements with a value of 1 (or
+%               TRUE) indicate the pixels to include in the analysis and
+%               elements with a value of 0 (or FALSE) indicate pixels to
+%               omit from the analysis. When analyzing just a single pair
+%               of masks (one analysis), format as a logical matrix of any
 %               dimensionality with the same size and shape as 'X_mask' and
 %               'Y_mask'. To analyze multiple pairs of masks with one
 %               function call to SPACE, format as a cell array of logical
 %               matrices with the same number of elements as 'X_mask' and
 %               'Y_mask', where matrices in corresponding elements to
-%               'X_mask' and 'Y_mask' have the same size and shape.
+%               'X_mask' and 'Y_mask' have the same size and shape. This
+%               input is MANDATORY if 'X_mask' and 'Y_mask' were first
+%               processed using the Isotropic Replacement method, otherwise
+%               this analyses will produce 100% garbage results.
 %
 % 4. pixel_size - OPTIONAL input which specifies the real-world size
 %                 (side-length) of pixels composing 'X_mask' and 'Y_mask'.
-%                 Formatted as a positive scalar number for single analyses
-%                 and a vector with as many elements as the mask variables
-%                 when performing multiple analyses with one function call
-%                 to SPACE. This input is used to scale SPACE results so
+%                 Formatted as a positive numeric scalar for single
+%                 analyses and a vector with as many elements as the mask
+%                 variables when performing multiple analyses with one
+%                 function call to SPACE. If this input is not provided,
+%                 then distance-derived SPACE outputs will have units of
+%                 pixel-count. This input is used to scale SPACE results so
 %                 they have the same-real world units as the input masks.
 %                 For the SPACE analysis to produce results which are not
 %                 100% garbage, the real-world shape of mask pixels must be
@@ -68,13 +72,13 @@ function [varargout] = SPACE(X_mask, Y_mask, ROI_mask, pixel_size)
 %                 length, and this length is the single value that needs to
 %                 be assigned to this fouth input. If your pixels are in
 %                 fact not cuboidal (e.g. the x/y-resolution of your masks
-%                 is different than their z-resolution), fear not! Your
-%                 just have to resample the masks so that they are
-%                 isotropic with cuboidal pixels. This can easily be done
-%                 using the Isotropic Replacement method found at the
-%                 GitHub link below. The 'isotropic_ROI mask' (2nd) output
-%                 from isotropic replacement function must then be used as
-%                 the 3rd input to this function ('ROI_mask') for the SPACE
+%                 is different than their z-resolution), fear not! You just
+%                 have to resample the masks so that they are isotropic and
+%                 have cuboidal pixels. This can easily be done using the
+%                 Isotropic Replacement method found at the GitHub link
+%                 below. The 'isotropic_ROI mask' (2nd) output from
+%                 isotropic replacement function must then be used as the
+%                 3rd input to this function ('ROI_mask') for the SPACE
 %                 analysis to be performed correctly.
 %
 % -------------------------------------------------------------------------
@@ -86,58 +90,62 @@ function [varargout] = SPACE(X_mask, Y_mask, ROI_mask, pixel_size)
 %                     for the SPACE analysis of each pair of input masks.
 %                     If 'X_mask' and 'Y_mask' are input as single matrices
 %                     (single analysis), then this will be formatted as
-%                     table with one row and a column for each SPACE
-%                     output. If 'X_mask' and 'Y_mask' are input as cell
-%                     arrays of matrices (multiple analysis with one
+%                     table with 1 row and 24 columns corresponding to each
+%                     SPACE output. If 'X_mask' and 'Y_mask' are input as
+%                     cell arrays of matrices (multiple analyses with one
 %                     function call), then this will be formatted as a
 %                     table where each row corresponds to the SPACE outputs
 %                     for each pair of masks, thus this table will have as
 %                     many rows as elements of the cell arrays 'X_mask' and
-%                     'Y_mask'. See the linked GitHub page for info on what
-%                     each column represents.
+%                     'Y_mask'. See the linked GitHub page below for info
+%                     on what each column represents.
 %
 % 2. Batch_Results - This is the second output from SPACE and is only
 %                    produced when performing multiple analyses with one
 %                    function call to SPACE (when 'X_mask' and 'Y_mask' are
 %                    input as cell arrays of matrices). Formatted as a
-%                    table containing the summary results describing the
+%                    table with 1 row and 41 columns that detail the the
 %                    aggregate analysis of all pairs of masks. This table
 %                    contains fundamentally different information than
-%                    'Single_Results' - See the linked GitHub page for info
-%                    on what each column represents. If you are using SPACE
-%                    to perform multiple pair-wise comparisons between
-%                    different groups of mask sets, you could theoretically
-%                    call SPACE in a for loop and append batch results from
-%                    each multi-mask analysis to this table as a
-%                    programmatic way to organize your data.
+%                    'Single_Results' - See the linked GitHub page below
+%                    for info on what each column represents. If you are
+%                    using SPACE to perform multiple pair-wise comparisons
+%                    between different groups of mask sets, you could
+%                    theoretically call SPACE in a for loop and append
+%                    batch results from each multi-mask analysis to this
+%                    table as a programmatic way to organize your data.
 %
 % -------------------------------------------------------------------------
 %
 % USES CASES:
 % 
-% [...] = SPACE(X_mask, Y_mask) perform analysis without specifiying an
-% ROI or pixel size. Here, the ROI is treated as the entire image and the
-% pixel is given a size of 1.
+% [...] = SPACE(X_mask, Y_mask) 
+% Perform analysis without specifiying an ROI or pixel size. Here, the ROI
+% is treated as the entire image and the pixel is given a size (side
+% length) of 1.
 %
-% [...] = SPACE(X_mask, Y_mask, ROI_mask) perform analysis of subregions
-% specified by ROI_mask. Pixels are given a size of 1.
+% [...] = SPACE(X_mask, Y_mask, ROI_mask) 
+% Perform analysis of subregions specified by ROI_mask. Pixels are given a
+% size of 1.
 %
-% [...] = SPACE(X_mask, Y_mask, [], pixel_size) perform analysis on
-% entire image but pixels are given sizes acording to pixel_size
+% [...] = SPACE(X_mask, Y_mask, [], pixel_size) 
+% Perform analysis on entire image but pixels are given sizes according to
+% pixel_size.
 %
-% [...] = SPACE(X_mask, Y_mask, ROI_mask, pixel_size) perform subregion
-% analysis with user defined pixel size.
+% [...] = SPACE(X_mask, Y_mask, ROI_mask, pixel_size) 
+% Perform subregion analysis with user defined pixel size.
 %
-% [Sinlge_Results] = SPACE(...) returns a table containing the single-image
-% results for each input image. If only one image provided, the table will
-% have only one row. If n-images are provided, the table will have n-rows,
-% with row-i containing the SPACE results for image-i.
+% [Sinlge_Results] = SPACE(...) 
+% Returns a table containing the single-image results for each input image
+% pair. If only one image provided, the table will have only 1 row. If
+% n-images are provided, the table will have n-rows, with row-i containing
+% the SPACE results for image pair-i.
 %
-% [Single_Results, Batch_Results] = SPACE(...) if cell arrays of masks are
-% provided to the function, the first output is the single-image results as
-% described above, and the second output is a sinlge-row table containing
-% batch-image results which describes the aggregated behavior of the image
-% collection. 
+% [Single_Results, Batch_Results] = SPACE(...) 
+% If cell arrays of masks are provided to the function, the first output is
+% the single-image results as described above, and the second output is a
+% sinlge-row table containing batch-image results which describes the
+% aggregated behavior of the image set.
 %
 % -------------------------------------------------------------------------
 %

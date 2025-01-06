@@ -300,17 +300,22 @@ function [pdf_x, pdf_y] = epdf(distances, weight)
 % Email: andysoltisz@gmail.com
 % Last Updated: 05/11/2023
 
-    [pdf_y,pdf_x] = groupcounts(distances);
-
-    % make sure PDF is defined for full distance range [0, maxDistance]
-    if pdf_x(1) ~= 0
-        pdf_x = [0; pdf_x];
-        pdf_y = [0; pdf_y];
-    end
-
-    % scale event counts if their weight is specified
-    if nargin == 3 
-        pdf_y = pdf_y * weight;
+    if isempty(distances)
+        pdf_x = 0;
+        pdf_y = 0;
+    else
+        [pdf_y,pdf_x] = groupcounts(distances);
+    
+        % make sure PDF is defined for full distance range [0, maxDistance]
+        if pdf_x(1) ~= 0
+            pdf_x = [0; pdf_x];
+            pdf_y = [0; pdf_y];
+        end
+    
+        % scale event counts if their weight is specified
+        if nargin == 3 
+            pdf_y = pdf_y * weight;
+        end
     end
 
 end
@@ -330,41 +335,49 @@ function [delta_cdf_x, delta_cdf_y, spatial_association_index, p_value, verdict]
 % Email: andysoltisz@gmail.com
 % Last Updated: 05/11/2023
 
-    if nargin < 7
-        alpha = 0.05; % default value
+    if obs_n == 0
+        delta_cdf_x = nan;
+        delta_cdf_y = nan;
+        spatial_association_index = nan;
+        p_value = nan;
+        verdict = nan;
+    else
+        if nargin < 7
+            alpha = 0.05; % default value
+        end
+        
+        % Convert to column vector to ensure consistent output format
+        obs_pdf_x = obs_pdf_x(:);
+        obs_pdf_y = obs_pdf_y(:);
+        ran_pdf_x = ran_pdf_x(:);
+        ran_pdf_y = ran_pdf_y(:);
+    
+        % Regenerate input distributions over a global x-coordinate scheme
+        delta_cdf_x = unique([obs_pdf_x; ran_pdf_x]); % find common bins
+        [~, obs_idx] = ismember(obs_pdf_x, delta_cdf_x); % find where obs_pdf_y fits into global x-coordinates
+        [~, ran_idx] = ismember(ran_pdf_x, delta_cdf_x); % find where ran_pdf_y fits into global x-coordinates
+        obs_pdf_y_global = zeros(size(delta_cdf_x)); % initialize new y-values as zeros
+        ran_pdf_y_global = obs_pdf_y_global; % initialize new y-values as zeros
+        obs_pdf_y_global(obs_idx) = obs_pdf_y; % insert original y-values onto global x-coordinate scheme
+        ran_pdf_y_global(ran_idx) = ran_pdf_y; % insert original y-values onto global x-coordinate scheme
+    
+        % Compute eCDFs from ePDFs
+        obs_cdf_y = pdf2cdf(obs_pdf_y_global);
+        ran_cdf_y = pdf2cdf(ran_pdf_y_global);
+    
+        % Compute the test statistic
+        delta_cdf_y = obs_cdf_y - ran_cdf_y;
+        [ks_p, ks_idx] = max(abs(delta_cdf_y));
+        spatial_association_index = delta_cdf_y(ks_idx);
+        
+        % Compute the asymptotic P-value approximation and accept or reject the
+        % null hypothesis on the basis of the P-value (based on code found in
+        % built-in kstest2)
+        n = obs_n * ran_n / (obs_n + ran_n);
+        lambda = max((sqrt(n) + 0.12 + 0.11 / sqrt(n)) * ks_p, 0);
+        p_value = exp(-2 * lambda * lambda);
+        verdict = (alpha >= p_value);
     end
-    
-    % Convert to column vector to ensure consistent output format
-    obs_pdf_x = obs_pdf_x(:);
-    obs_pdf_y = obs_pdf_y(:);
-    ran_pdf_x = ran_pdf_x(:);
-    ran_pdf_y = ran_pdf_y(:);
-
-    % Regenerate input distributions over a global x-coordinate scheme
-    delta_cdf_x = unique([obs_pdf_x; ran_pdf_x]); % find common bins
-    [~, obs_idx] = ismember(obs_pdf_x, delta_cdf_x); % find where obs_pdf_y fits into global x-coordinates
-    [~, ran_idx] = ismember(ran_pdf_x, delta_cdf_x); % find where ran_pdf_y fits into global x-coordinates
-    obs_pdf_y_global = zeros(size(delta_cdf_x)); % initialize new y-values as zeros
-    ran_pdf_y_global = obs_pdf_y_global; % initialize new y-values as zeros
-    obs_pdf_y_global(obs_idx) = obs_pdf_y; % insert original y-values onto global x-coordinate scheme
-    ran_pdf_y_global(ran_idx) = ran_pdf_y; % insert original y-values onto global x-coordinate scheme
-
-    % Compute eCDFs from ePDFs
-    obs_cdf_y = pdf2cdf(obs_pdf_y_global);
-    ran_cdf_y = pdf2cdf(ran_pdf_y_global);
-
-    % Compute the test statistic
-    delta_cdf_y = obs_cdf_y - ran_cdf_y;
-    [ks_p, ks_idx] = max(abs(delta_cdf_y));
-    spatial_association_index = delta_cdf_y(ks_idx);
-    
-    % Compute the asymptotic P-value approximation and accept or reject the
-    % null hypothesis on the basis of the P-value (based on code found in
-    % built-in kstest2)
-    n = obs_n * ran_n / (obs_n + ran_n);
-    lambda = max((sqrt(n) + 0.12 + 0.11 / sqrt(n)) * ks_p, 0);
-    p_value = exp(-2 * lambda * lambda);
-    verdict = (alpha >= p_value);
 
 end
 
@@ -789,7 +802,11 @@ function cdf_y = pdf2cdf(pdf_y)
 % Email: andysoltisz@gmail.com
 % Last Updated: 05/11/2023
 
-    cdf_y = cumsum(pdf_y);
-    cdf_y = cdf_y ./ cdf_y(end);
+    if sum(pdf_y) == 0
+        cdf_y = 0;
+    else
+        cdf_y = cumsum(pdf_y);
+        cdf_y = cdf_y ./ cdf_y(end);
+    end
 
 end

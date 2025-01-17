@@ -62,7 +62,7 @@ ROI – region of interest
 21. **YX_Delta_CDF_x** – x-coordinates (distance) of Y-->X delta function  
 22. **YX_Delta_CDF_y** – y-coordinates (delta probability) of Y-->X delta function  
 23. **YX_Spatial_Association_Index** – spatial association index for Y-->X. Computed as the absolute maximum of YX_Delta_CDF_y.   
-24. **YX_Spatial_Assocation_pValue** – p-value from a 2-sided KS test comparing the Y-->X observed and random distributions. The null hypothesis states that these distributions are identical and therefor X-->Y is CSR  
+24. **YX_Spatial_Association_pValue** – p-value from a 2-sided KS test comparing the Y-->X observed and random distributions. The null hypothesis states that these distributions are identical and therefor X-->Y is CSR  
  
 ## Table field definitions for SPACE batch-image analysis function output. Rows correspond to individual batches of images, columns correspond to batch SPACE results for each group of images:  
 1. **Sample_Size** – number of images in the batch  

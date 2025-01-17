@@ -15,7 +15,7 @@
 % Publication: https://doi.org/10.1093/mam/ozae022
 % Last Updated: 10/05/2023
 %
-% Copyright (C) 2024, Andrew Michael Soltisz. All rights reserved.
+% Copyright 2024, Andrew Michael Soltisz. All rights reserved.
 % This source code is licensed under the BSD-3-Clause License found in the
 % LICENSE.txt file in the root directory of this source tree.
 
@@ -41,10 +41,11 @@ ROI_mask = imread([example_data, 'ROI_mask.tif']);
 %% Single Image SPACE Analysis 
 
 % different use cases are listed below, un-comment one at a time
-% Results = SPACE(X_mask, Y_mask); % default ROI is full image
-Results = SPACE(X_mask, Y_mask, ROI_mask); % specify ROI
-% Results = SPACE(X_mask, Y_mask, [], 0.2); % no ROI but pixel size of 0.2um is specified, input ROI as empty matrix
-% Results = SPACE(X_mask, Y_mask, ROI_mask, 0.2); % Both ROI and pixel size of 0.2um are specified
+
+[Results_X, Results_Y] = SPACE(X_mask, Y_mask); % default ROI is full image
+% [Results_X, Results_Y] = SPACE(X_mask, Y_mask, ROI_mask); % specify ROI
+% [Results_X, Results_Y] = SPACE(X_mask, Y_mask, [], 0.2); % no ROI but pixel size of 0.2um is specified, input ROI as empty matrix
+% [Results_X, Results_Y] = SPACE(X_mask, Y_mask, ROI_mask, 0.2); % Both ROI and pixel size of 0.2um are specified
 
 %% Plot Results
 
@@ -70,13 +71,13 @@ figure;
 sgtitle("Single Image SPACE Results");
 X_color = 'r';
 Y_color = 'g';
-xmax = max([Results.XY_Delta_CDF_x{1}(end), Results.XY_Delta_CDF_x{1}(end)]); % ensure common x-limit for all plots
+xmax = max([Results_X.Delta_CDF_x{1}(end), Results_Y.Delta_CDF_x{1}(end)]); % ensure common x-limit for all plots
 
 % X-->Y CDFs
 subplot(2,2,1);
 hold on
-p(1) = plot(Results.XY_Observed_x{1}, Results.XY_Observed_CDF_y{1}, X_color);
-p(2) = plot(Results.XY_Random_x{1}, Results.XY_Random_CDF_y{1}, X_color, 'linestyle', '--');
+p(1) = plot(Results_X.Observed_x{1}, Results_X.Observed_CDF_y{1}, X_color);
+p(2) = plot(Results_X.Random_x{1}, Results_X.Random_CDF_y{1}, X_color, 'linestyle', '--');
 legend(p,["Observed","Random"],'location','southeast');
 title("X\rightarrowY CDFs");
 xlabel("Distance from Y");
@@ -87,11 +88,11 @@ yticks(0:0.2:1);
 grid on;
 hold off;
 
-% X-->Y CDFs
+% Y-->Y CDFs
 subplot(2,2,2);
 hold on
-p(1) = plot(Results.YX_Observed_x{1}, Results.YX_Observed_CDF_y{1}, Y_color);
-p(2) = plot(Results.YX_Random_x{1}, Results.YX_Random_CDF_y{1}, Y_color, 'linestyle', '--');
+p(1) = plot(Results_Y.Observed_x{1}, Results_Y.Observed_CDF_y{1}, Y_color);
+p(2) = plot(Results_Y.Random_x{1}, Results_Y.Random_CDF_y{1}, Y_color, 'linestyle', '--');
 legend(p,["Observed","Random"],'location','southeast');
 title("Y\rightarrowX CDFs");
 xlabel("Distance from X");
@@ -106,7 +107,7 @@ hold off;
 subplot(2,2,3);
 hold on
 plot([0,xmax], [0,0], 'k'); % plot y=0 to highlight x-axis
-plot(Results.XY_Delta_CDF_x{1}, Results.XY_Delta_CDF_y{1}, X_color);
+plot(Results_X.Delta_CDF_x{1}, Results_X.Delta_CDF_y{1}, X_color);
 title("X\rightarrowY \DeltaCDF");
 xlabel("Distance from Y");
 xlim([0, xmax]);
@@ -116,11 +117,11 @@ yticks(-1:0.25:1);
 grid on;
 hold off;
 
-% X-->Y Delta CDFs
+% Y-->Y Delta CDFs
 subplot(2,2,4);
 hold on
 plot([0,xmax], [0,0], 'k'); % plot y=0 to highlight x-axis
-plot(Results.YX_Delta_CDF_x{1}, Results.YX_Delta_CDF_y{1}, Y_color);
+plot(Results_Y.Delta_CDF_x{1}, Results_Y.Delta_CDF_y{1}, Y_color);
 title("Y\rightarrowX \DeltaCDF");
 xlabel("Distance from X");
 xlim([0, xmax]);
@@ -136,7 +137,7 @@ figure;
 hold on;
 plot([-1, 1], [0, 0], 'k'); % plot black line across x-axis to highlight y=0
 plot([0, 0], [-1, 1], 'k'); % plot black line across x-axis to highlight x=0
-scatter(Results.XY_Spatial_Association_Index,Results.YX_Spatial_Association_Index,100,'filled','markeredgecolor','k'); % aggregated
+scatter(Results_X.Spatial_Association_Index,Results_Y.Spatial_Association_Index,100,'filled','markeredgecolor','k'); % aggregated
 title("Spatial Association Index Phase Diagram");
 xlabel("X\rightarrowY Spatial Association");
 xlim([-1, 1]);

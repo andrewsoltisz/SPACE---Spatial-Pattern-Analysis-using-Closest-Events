@@ -18,7 +18,7 @@
 % Publication: https://doi.org/10.1093/mam/ozae022
 % Last Updated: 10/05/2023
 %
-% Copyright (C) 2024, Andrew Michael Soltisz. All rights reserved.
+% Copyright 2024, Andrew Michael Soltisz. All rights reserved.
 % This source code is licensed under the BSD-3-Clause License found in the
 % LICENSE.txt file in the root directory of this source tree.
 
@@ -46,10 +46,19 @@ n_images = numel(X_mask_list);
 %% Batch image SPACE analysis
 
 % Different use cases are listed below, un-comment one at a time
-[Single_Results, Batch_Results] = SPACE(X_mask_list, Y_mask_list); % default ROI is full image
-% [Single_Results, Batch_Results] = SPACE(X_mask_list, Y_mask_list, ROI_mask_list); % specify ROI
-% [Single_Results, Batch_Results] = SPACE(X_mask_list, Y_mask_list, [], repelem(0.2,n_images,1)); % no ROI but pixel size of 0.2um is specified, input ROI as empty matrix
-% [Single_Results, Batch_Results] = SPACE(X_mask_list, Y_mask_list, ROI_mask_list, repelem(0.2,n_images,1)); % Both ROI and pixel size of 0.2um are specified
+
+wb = waitbar(0, sprintf("Analyzing image: %i/%i", 0, n_images));
+for i_image = 1:n_images
+    [Results_X(i_image,:), Results_Y(i_image,:)] = SPACE(X_mask_list{i_image}, Y_mask_list{i_image}); % default ROI is full image
+    % [Single_Results, Batch_Results] = SPACE(X_mask_list{i_image}, Y_mask_list{i_image}, ROI_mask_list{i_image}); % specify ROI
+    % [Single_Results, Batch_Results] = SPACE(X_mask_list{i_image}, Y_mask_list{i_image}, [], 0.2); % no ROI but pixel size of 0.2um is specified, input ROI as empty matrix
+    % [Single_Results, Batch_Results] = SPACE(X_mask_list{i_image}, Y_mask_list{i_image}, ROI_mask_list{i_image}, 0.2); % Both ROI and pixel size of 0.2um are specified
+
+    waitbar(i_image/n_images, wb, sprintf("Analyzing image: %i/%i", i_image, n_images));
+end
+
+Batch_Results_X = SPACE_batch(Results_X);
+Batch_Results_Y = SPACE_batch(Results_Y);
 
 %% Plot Results
 
@@ -71,13 +80,13 @@ figure;
 sgtitle("Batch SPACE Results");
 X_color = 'r';
 Y_color = 'g';
-xmax = max([Batch_Results.XY_Global_x{1}(end), Batch_Results.XY_Global_x{1}(end)]); % ensure common x-limit for all plots
+xmax = max([Batch_Results_X.Global_x{1}(end), Batch_Results_Y.Global_x{1}(end)]); % ensure common x-limit for all plots
 
 % X-->Y CDFs
 subplot(2, 2, 1);
 hold on;
-[l(1), e(1)] = plot_error(Batch_Results.XY_Observed_CDF_x{1}, Batch_Results.XY_Observed_CDF_y_Median{1}, Batch_Results.XY_Observed_CDF_y_Lower{1}, Batch_Results.XY_Observed_CDF_y_Upper{1});
-[l(2), e(2)] = plot_error(Batch_Results.XY_Random_CDF_x{1}, Batch_Results.XY_Random_CDF_y_Median{1}, Batch_Results.XY_Random_CDF_y_Lower{1}, Batch_Results.XY_Random_CDF_y_Upper{1}); 
+[l(1), e(1)] = plot_error(Batch_Results_X.Observed_CDF_x{1}, Batch_Results_X.Observed_CDF_y_Median{1}, Batch_Results_X.Observed_CDF_y_Lower{1}, Batch_Results_X.Observed_CDF_y_Upper{1});
+[l(2), e(2)] = plot_error(Batch_Results_X.Random_CDF_x{1}, Batch_Results_X.Random_CDF_y_Median{1}, Batch_Results_X.Random_CDF_y_Lower{1}, Batch_Results_X.Random_CDF_y_Upper{1}); 
 l(1).Color = X_color;
 l(2).Color = 'k';
 l(2).LineStyle = '--';
@@ -96,8 +105,8 @@ hold off;
 % Y-->X CDFs
 subplot(2, 2, 2);
 hold on;
-[l(1), e(1)] = plot_error(Batch_Results.YX_Observed_CDF_x{1}, Batch_Results.YX_Observed_CDF_y_Median{1}, Batch_Results.YX_Observed_CDF_y_Lower{1}, Batch_Results.YX_Observed_CDF_y_Upper{1}); 
-[l(2), e(2)] = plot_error(Batch_Results.YX_Random_CDF_x{1}, Batch_Results.YX_Random_CDF_y_Median{1}, Batch_Results.YX_Random_CDF_y_Lower{1}, Batch_Results.YX_Random_CDF_y_Upper{1}); 
+[l(1), e(1)] = plot_error(Batch_Results_Y.Observed_CDF_x{1}, Batch_Results_Y.Observed_CDF_y_Median{1}, Batch_Results_Y.Observed_CDF_y_Lower{1}, Batch_Results_Y.Observed_CDF_y_Upper{1}); 
+[l(2), e(2)] = plot_error(Batch_Results_Y.Random_CDF_x{1}, Batch_Results_Y.Random_CDF_y_Median{1}, Batch_Results_Y.Random_CDF_y_Lower{1}, Batch_Results_Y.Random_CDF_y_Upper{1}); 
 l(1).Color = Y_color;
 l(2).Color = 'k';
 l(2).LineStyle = '--';
@@ -117,7 +126,7 @@ hold off;
 subplot(2, 2, 3);
 hold on;
 plot([0, xmax], [0, 0], 'k'); % plot y=0 to highlight x-axis
-[p, e] = plot_error(Batch_Results.XY_Delta_CDF_x{1}, Batch_Results.XY_Delta_CDF_y_Median{1}, Batch_Results.XY_Delta_CDF_y_Lower{1}, Batch_Results.XY_Delta_CDF_y_Upper{1});
+[p, e] = plot_error(Batch_Results_X.Delta_CDF_x{1}, Batch_Results_X.Delta_CDF_y_Median{1}, Batch_Results_X.Delta_CDF_y_Lower{1}, Batch_Results_X.Delta_CDF_y_Upper{1});
 p.Color = X_color;
 e.FaceColor = X_color;
 title("X\rightarrowY Median \DeltaCDF");
@@ -133,7 +142,7 @@ hold off;
 subplot(2, 2, 4);
 hold on;
 plot([0, xmax], [0, 0], 'k'); % plot y=0 to highlight x-axis
-[p, e] = plot_error(Batch_Results.YX_Delta_CDF_x{1}, Batch_Results.YX_Delta_CDF_y_Median{1}, Batch_Results.YX_Delta_CDF_y_Lower{1}, Batch_Results.YX_Delta_CDF_y_Upper{1});
+[p, e] = plot_error(Batch_Results_Y.Delta_CDF_x{1}, Batch_Results_Y.Delta_CDF_y_Median{1}, Batch_Results_Y.Delta_CDF_y_Lower{1}, Batch_Results_Y.Delta_CDF_y_Upper{1});
 p.Color = Y_color;
 e.FaceColor = Y_color;
 title("Y\rightarrowX Median \DeltaCDF");
@@ -151,7 +160,7 @@ figure;
 hold on;
 plot([-1, 1], [0, 0], 'k'); % plot black line across x-axis to highlight y=0
 plot([0, 0], [-1, 1], 'k'); % plot black line across x-axis to highlight x=0
-scatter(Batch_Results.XY_Sample_Spatial_Association_Index{1}, Batch_Results.YX_Sample_Spatial_Association_Index{1},'filled','markeredgecolor','k'); % dispersed
+scatter(Batch_Results_X.Sample_Spatial_Association_Index{1}, Batch_Results_Y.Sample_Spatial_Association_Index{1},'filled','markeredgecolor','k'); % dispersed
 title("Spatial Association Index Phase Diagram");
 xlabel("X\rightarrowY Spatial Association");
 xlim([-1, 1]);
@@ -162,3 +171,5 @@ yticks(-1:0.25:1);
 grid on;
 axis square;
 hold off;
+
+close(wb);

@@ -24,7 +24,7 @@
 % Publication: https://doi.org/10.1093/mam/ozae022
 % Last Updated: 10/05/2023
 %
-% Copyright (C) 2024, Andrew Michael Soltisz. All rights reserved.
+% Copyright 2024, Andrew Michael Soltisz. All rights reserved.
 % This source code is licensed under the BSD-3-Clause License found in the
 % LICENSE.txt file in the root directory of this source tree.
 
@@ -47,36 +47,73 @@ example_data = [example_data,filesep];
 load([example_data, 'X_mask_list_dis.mat']);
 load([example_data, 'Y_mask_list_dis.mat']);
 load([example_data, 'ROI_mask_list_dis.mat']);
+n_images_dis = numel(X_mask_list_dis);
 
 % Independent (ind)
 load([example_data, 'X_mask_list_ind.mat']);
 load([example_data, 'Y_mask_list_ind.mat']);
 load([example_data, 'ROI_mask_list_ind.mat']);
+n_images_ind = numel(X_mask_list_ind);
 
 % Aggregated (agg)
 load([example_data, 'X_mask_list_agg.mat']);
 load([example_data, 'Y_mask_list_agg.mat']);
 load([example_data, 'ROI_mask_list_agg.mat']);
+n_images_agg = numel(X_mask_list_agg);
 
-%% Batch image SPACE analysis for each group of example images
+%% Perform SPACE Analysis of Individual Image Pairs
 
-[Single_Results_dis, Batch_Results_dis] = SPACE(X_mask_list_dis, Y_mask_list_dis, ROI_mask_list_dis);
-[Single_Results_ind, Batch_Results_ind] = SPACE(X_mask_list_ind, Y_mask_list_ind, ROI_mask_list_ind);
-[Single_Results_agg, Batch_Results_agg] = SPACE(X_mask_list_agg, Y_mask_list_agg, ROI_mask_list_agg);
+% dispersed dataset
+wb = waitbar(0, sprintf("Analyzing dispersed image: %i/%i", 0, n_images_dis));
+for i_image = 1:n_images_dis
+    [X_Results_dis(i_image,:), Y_Results_dis(i_image,:)] = SPACE(X_mask_list_dis{i_image}, Y_mask_list_dis{i_image}); % default ROI is full image
+    waitbar(i_image/n_images_dis, wb, sprintf("Analyzing dispersed image: %i/%i", i_image, n_images_dis));
+end
+close(wb);
+
+% independent dataset
+wb = waitbar(0, sprintf("Analyzing independent image: %i/%i", 0, n_images_ind));
+for i_image = 1:n_images_ind
+    [X_Results_ind(i_image,:), Y_Results_ind(i_image,:)] = SPACE(X_mask_list_ind{i_image}, Y_mask_list_ind{i_image}); % default ROI is full image
+    waitbar(i_image/n_images_ind, wb, sprintf("Analyzing independent image: %i/%i", i_image, n_images_ind));
+end
+close(wb);
+
+% aggregated dataset
+wb = waitbar(0, sprintf("Analyzing aggregated image: %i/%i", 0, n_images_agg));
+for i_image = 1:n_images_agg
+    [X_Results_agg(i_image,:), Y_Results_agg(i_image,:)] = SPACE(X_mask_list_agg{i_image}, Y_mask_list_agg{i_image}); % default ROI is full image
+    waitbar(i_image/n_images_agg, wb, sprintf("Analyzing aggregated image: %i/%i", i_image, n_images_agg));
+end
+close(wb);
+
+%% Peform Batch Analysis of SPACE Results
+
+% dispersed dataset
+X_Batch_Results_dis = SPACE_batch(X_Results_dis);
+Y_Batch_Results_dis = SPACE_batch(Y_Results_dis);
+
+% independent dataset
+X_Batch_Results_ind = SPACE_batch(X_Results_ind);
+Y_Batch_Results_ind = SPACE_batch(Y_Results_ind);
+
+% aggregated dataset
+X_Batch_Results_agg = SPACE_batch(X_Results_agg);
+Y_Batch_Results_agg = SPACE_batch(Y_Results_agg);
 
 %% Compare spatial association indices accross experimental groups using a weighted, 2-sided Student's T-test (ttest2w)
 
 % dispersed VS independent
-XY_p_dis_ind = ttest2w(Batch_Results_dis.XY_Sample_Spatial_Association_Index{1}, Batch_Results_ind.XY_Sample_Spatial_Association_Index{1}, Batch_Results_dis.XY_Sample_Event_Count{1}, Batch_Results_ind.XY_Sample_Event_Count{1}); % X-->Y 
-YX_p_dis_ind = ttest2w(Batch_Results_dis.YX_Sample_Spatial_Association_Index{1}, Batch_Results_ind.YX_Sample_Spatial_Association_Index{1}, Batch_Results_dis.YX_Sample_Event_Count{1}, Batch_Results_ind.YX_Sample_Event_Count{1}); % Y-->X
+X_p_dis_ind = ttest2w(X_Batch_Results_dis.Sample_Spatial_Association_Index{1}, X_Batch_Results_ind.Sample_Spatial_Association_Index{1}, X_Batch_Results_dis.Sample_Event_Count{1}, X_Batch_Results_ind.Sample_Event_Count{1}); % X-->Y 
+Y_p_dis_ind = ttest2w(Y_Batch_Results_dis.Sample_Spatial_Association_Index{1}, Y_Batch_Results_ind.Sample_Spatial_Association_Index{1}, Y_Batch_Results_dis.Sample_Event_Count{1}, Y_Batch_Results_ind.Sample_Event_Count{1}); % Y-->X
 
 % dispersed VS aggregated
-XY_p_dis_agg = ttest2w(Batch_Results_dis.XY_Sample_Spatial_Association_Index{1}, Batch_Results_agg.XY_Sample_Spatial_Association_Index{1}, Batch_Results_dis.XY_Sample_Event_Count{1}, Batch_Results_agg.XY_Sample_Event_Count{1}); % X-->Y 
-YX_p_dis_agg = ttest2w(Batch_Results_dis.YX_Sample_Spatial_Association_Index{1}, Batch_Results_agg.YX_Sample_Spatial_Association_Index{1}, Batch_Results_dis.YX_Sample_Event_Count{1}, Batch_Results_agg.YX_Sample_Event_Count{1}); % Y-->X
+X_p_dis_agg = ttest2w(X_Batch_Results_dis.Sample_Spatial_Association_Index{1}, X_Batch_Results_agg.Sample_Spatial_Association_Index{1}, X_Batch_Results_dis.Sample_Event_Count{1}, X_Batch_Results_agg.Sample_Event_Count{1}); % X-->Y 
+Y_p_dis_agg = ttest2w(Y_Batch_Results_dis.Sample_Spatial_Association_Index{1}, Y_Batch_Results_agg.Sample_Spatial_Association_Index{1}, Y_Batch_Results_dis.Sample_Event_Count{1}, Y_Batch_Results_agg.Sample_Event_Count{1}); % Y-->X
 
 % independent VS aggregated
-XY_p_ind_agg = ttest2w(Batch_Results_ind.XY_Sample_Spatial_Association_Index{1}, Batch_Results_agg.XY_Sample_Spatial_Association_Index{1}, Batch_Results_ind.XY_Sample_Event_Count{1}, Batch_Results_agg.XY_Sample_Event_Count{1}); % X-->Y 
-YX_p_ind_agg = ttest2w(Batch_Results_ind.YX_Sample_Spatial_Association_Index{1}, Batch_Results_agg.YX_Sample_Spatial_Association_Index{1}, Batch_Results_ind.YX_Sample_Event_Count{1}, Batch_Results_agg.YX_Sample_Event_Count{1}); % Y-->X
+X_p_ind_agg = ttest2w(X_Batch_Results_ind.Sample_Spatial_Association_Index{1}, X_Batch_Results_agg.Sample_Spatial_Association_Index{1}, X_Batch_Results_ind.Sample_Event_Count{1}, X_Batch_Results_agg.Sample_Event_Count{1}); % X-->Y 
+Y_p_ind_agg = ttest2w(Y_Batch_Results_ind.Sample_Spatial_Association_Index{1}, Y_Batch_Results_agg.Sample_Spatial_Association_Index{1}, Y_Batch_Results_ind.Sample_Event_Count{1}, Y_Batch_Results_agg.Sample_Event_Count{1}); % Y-->X
 
 %% Plot X-->Y Functions
 
@@ -101,15 +138,15 @@ X_color = 'r';
 Y_color = 'g';
 sgtitle("X\rightarrowY Spatial Relationship");
 % ensure common x-limit for all plots
-xmax = max([Batch_Results_dis.XY_Global_x{1}(end), Batch_Results_dis.YX_Global_x{1}(end),...
-            Batch_Results_ind.XY_Global_x{1}(end), Batch_Results_ind.YX_Global_x{1}(end),...
-            Batch_Results_agg.XY_Global_x{1}(end), Batch_Results_agg.YX_Global_x{1}(end)]);
+xmax = max([X_Batch_Results_dis.Global_x{1}(end), Y_Batch_Results_dis.Global_x{1}(end),...
+            X_Batch_Results_ind.Global_x{1}(end), Y_Batch_Results_ind.Global_x{1}(end),...
+            X_Batch_Results_agg.Global_x{1}(end), Y_Batch_Results_agg.Global_x{1}(end)]);
 
 % Dispersed CDFs
 subplot(2, 3, 1);
 hold on;
-[l(1), e(1)] = plot_error(Batch_Results_dis.XY_Observed_CDF_x{1}, Batch_Results_dis.XY_Observed_CDF_y_Median{1}, Batch_Results_dis.XY_Observed_CDF_y_Lower{1}, Batch_Results_dis.XY_Observed_CDF_y_Upper{1}); % dispersed observed CDF
-[l(2), e(2)] = plot_error(Batch_Results_dis.XY_Random_CDF_x{1}, Batch_Results_dis.XY_Random_CDF_y_Median{1}, Batch_Results_dis.XY_Random_CDF_y_Lower{1}, Batch_Results_dis.XY_Random_CDF_y_Upper{1}); % dispersed random CDF
+[l(1), e(1)] = plot_error(X_Batch_Results_dis.Observed_CDF_x{1}, X_Batch_Results_dis.Observed_CDF_y_Median{1}, X_Batch_Results_dis.Observed_CDF_y_Lower{1}, X_Batch_Results_dis.Observed_CDF_y_Upper{1}); % dispersed observed CDF
+[l(2), e(2)] = plot_error(X_Batch_Results_dis.Random_CDF_x{1}, X_Batch_Results_dis.Random_CDF_y_Median{1}, X_Batch_Results_dis.Random_CDF_y_Lower{1}, X_Batch_Results_dis.Random_CDF_y_Upper{1}); % dispersed random CDF
 l(1).Color = X_color;
 l(2).Color = 'k';
 l(2).LineStyle = '--';
@@ -128,8 +165,8 @@ hold off;
 % Independent CDFs
 subplot(2,3 , 2);
 hold on;
-[l(1), e(1)] = plot_error(Batch_Results_ind.XY_Observed_CDF_x{1}, Batch_Results_ind.XY_Observed_CDF_y_Median{1}, Batch_Results_ind.XY_Observed_CDF_y_Lower{1}, Batch_Results_ind.XY_Observed_CDF_y_Upper{1}); % independent observed CDF
-[l(2), e(2)] = plot_error(Batch_Results_ind.XY_Random_CDF_x{1}, Batch_Results_ind.XY_Random_CDF_y_Median{1}, Batch_Results_ind.XY_Random_CDF_y_Lower{1}, Batch_Results_ind.XY_Random_CDF_y_Upper{1}); % independent random CDF
+[l(1), e(1)] = plot_error(X_Batch_Results_ind.Observed_CDF_x{1}, X_Batch_Results_ind.Observed_CDF_y_Median{1}, X_Batch_Results_ind.Observed_CDF_y_Lower{1}, X_Batch_Results_ind.Observed_CDF_y_Upper{1}); % independent observed CDF
+[l(2), e(2)] = plot_error(X_Batch_Results_ind.Random_CDF_x{1}, X_Batch_Results_ind.Random_CDF_y_Median{1}, X_Batch_Results_ind.Random_CDF_y_Lower{1}, X_Batch_Results_ind.Random_CDF_y_Upper{1}); % independent random CDF
 l(1).Color = X_color;
 l(2).Color = 'k';
 l(2).LineStyle = '--';
@@ -147,8 +184,8 @@ hold off;
 % Aggregated CDFs
 subplot(2,3,3);
 hold on;
-[l(1), e(1)] = plot_error(Batch_Results_agg.XY_Observed_CDF_x{1}, Batch_Results_agg.XY_Observed_CDF_y_Median{1}, Batch_Results_agg.XY_Observed_CDF_y_Lower{1}, Batch_Results_agg.XY_Observed_CDF_y_Upper{1}); % aggregated observed CDF
-[l(2), e(2)] = plot_error(Batch_Results_agg.XY_Random_CDF_x{1}, Batch_Results_agg.XY_Random_CDF_y_Median{1}, Batch_Results_agg.XY_Random_CDF_y_Lower{1}, Batch_Results_agg.XY_Random_CDF_y_Upper{1}); % aggregated random CDF
+[l(1), e(1)] = plot_error(X_Batch_Results_agg.Observed_CDF_x{1}, X_Batch_Results_agg.Observed_CDF_y_Median{1}, X_Batch_Results_agg.Observed_CDF_y_Lower{1}, X_Batch_Results_agg.Observed_CDF_y_Upper{1}); % aggregated observed CDF
+[l(2), e(2)] = plot_error(X_Batch_Results_agg.Random_CDF_x{1}, X_Batch_Results_agg.Random_CDF_y_Median{1}, X_Batch_Results_agg.Random_CDF_y_Lower{1}, X_Batch_Results_agg.Random_CDF_y_Upper{1}); % aggregated random CDF
 l(1).Color = X_color;
 l(2).Color = 'k';
 l(2).LineStyle = '--';
@@ -167,7 +204,7 @@ hold off;
 subplot(2, 3, 4);
 hold on;
 plot([0, xmax], [0, 0], 'k'); % plot black line across x-axis to highlight y=0
-[p, e] = plot_error(Batch_Results_dis.XY_Delta_CDF_x{1}, Batch_Results_dis.XY_Delta_CDF_y_Median{1}, Batch_Results_dis.XY_Delta_CDF_y_Lower{1}, Batch_Results_dis.XY_Delta_CDF_y_Upper{1}); % dispersed delta CDF
+[p, e] = plot_error(X_Batch_Results_dis.Delta_CDF_x{1}, X_Batch_Results_dis.Delta_CDF_y_Median{1}, X_Batch_Results_dis.Delta_CDF_y_Lower{1}, X_Batch_Results_dis.Delta_CDF_y_Upper{1}); % dispersed delta CDF
 p.Color = X_color;
 e.FaceColor = X_color;
 xlabel("Distance from Y", 'FontAngle', 'italic');
@@ -182,7 +219,7 @@ hold off;
 subplot(2, 3, 5);
 hold on;
 plot([0, xmax], [0, 0], 'k'); % plot black line across x-axis to highlight y=0
-[p, e] = plot_error(Batch_Results_ind.XY_Delta_CDF_x{1}, Batch_Results_ind.XY_Delta_CDF_y_Median{1}, Batch_Results_ind.XY_Delta_CDF_y_Lower{1}, Batch_Results_ind.XY_Delta_CDF_y_Upper{1}); % indpendent delta CDF
+[p, e] = plot_error(X_Batch_Results_ind.Delta_CDF_x{1}, X_Batch_Results_ind.Delta_CDF_y_Median{1}, X_Batch_Results_ind.Delta_CDF_y_Lower{1}, X_Batch_Results_ind.Delta_CDF_y_Upper{1}); % indpendent delta CDF
 p.Color = X_color;
 e.FaceColor = X_color;
 xlabel("Distance from Y", 'FontAngle', 'italic');
@@ -197,7 +234,7 @@ hold off;
 subplot(2, 3, 6);
 hold on;
 plot([0, xmax], [0, 0], 'k'); % plot black line across x-axis to highlight y=0
-[p, e] = plot_error(Batch_Results_agg.XY_Delta_CDF_x{1}, Batch_Results_agg.XY_Delta_CDF_y_Median{1}, Batch_Results_agg.XY_Delta_CDF_y_Lower{1}, Batch_Results_agg.XY_Delta_CDF_y_Upper{1}); % aggregated delta CDF
+[p, e] = plot_error(X_Batch_Results_agg.Delta_CDF_x{1}, X_Batch_Results_agg.Delta_CDF_y_Median{1}, X_Batch_Results_agg.Delta_CDF_y_Lower{1}, X_Batch_Results_agg.Delta_CDF_y_Upper{1}); % aggregated delta CDF
 p.Color = X_color;
 e.FaceColor = X_color;
 xlabel("Distance from Y", 'FontAngle', 'italic');
@@ -216,8 +253,8 @@ sgtitle("Y\rightarrowX Spatial Relationship");
 % Dispersed CDFs
 subplot(2, 3, 1);
 hold on;
-[l(1), e(1)] = plot_error(Batch_Results_dis.YX_Observed_CDF_x{1}, Batch_Results_dis.YX_Observed_CDF_y_Median{1}, Batch_Results_dis.YX_Observed_CDF_y_Lower{1}, Batch_Results_dis.YX_Observed_CDF_y_Upper{1}); % dispersed observed CDF
-[l(2), e(2)] = plot_error(Batch_Results_dis.YX_Random_CDF_x{1}, Batch_Results_dis.YX_Random_CDF_y_Median{1}, Batch_Results_dis.YX_Random_CDF_y_Lower{1}, Batch_Results_dis.YX_Random_CDF_y_Upper{1}); % dispersed random CDF
+[l(1), e(1)] = plot_error(Y_Batch_Results_dis.Observed_CDF_x{1}, Y_Batch_Results_dis.Observed_CDF_y_Median{1}, Y_Batch_Results_dis.Observed_CDF_y_Lower{1}, Y_Batch_Results_dis.Observed_CDF_y_Upper{1}); % dispersed observed CDF
+[l(2), e(2)] = plot_error(Y_Batch_Results_dis.Random_CDF_x{1}, Y_Batch_Results_dis.Random_CDF_y_Median{1}, Y_Batch_Results_dis.Random_CDF_y_Lower{1}, Y_Batch_Results_dis.Random_CDF_y_Upper{1}); % dispersed random CDF
 l(1).Color = Y_color;
 l(2).Color = 'k';
 l(2).LineStyle = '--';
@@ -236,8 +273,8 @@ hold off;
 % Independent CDFs
 subplot(2,3 , 2);
 hold on;
-[l(1), e(1)] = plot_error(Batch_Results_ind.YX_Observed_CDF_x{1}, Batch_Results_ind.YX_Observed_CDF_y_Median{1}, Batch_Results_ind.YX_Observed_CDF_y_Lower{1}, Batch_Results_ind.YX_Observed_CDF_y_Upper{1}); % independent observed CDF
-[l(2), e(2)] = plot_error(Batch_Results_ind.YX_Random_CDF_x{1}, Batch_Results_ind.YX_Random_CDF_y_Median{1}, Batch_Results_ind.YX_Random_CDF_y_Lower{1}, Batch_Results_ind.YX_Random_CDF_y_Upper{1}); % independent random CDF
+[l(1), e(1)] = plot_error(Y_Batch_Results_ind.Observed_CDF_x{1}, Y_Batch_Results_ind.Observed_CDF_y_Median{1}, Y_Batch_Results_ind.Observed_CDF_y_Lower{1}, Y_Batch_Results_ind.Observed_CDF_y_Upper{1}); % independent observed CDF
+[l(2), e(2)] = plot_error(Y_Batch_Results_ind.Random_CDF_x{1}, Y_Batch_Results_ind.Random_CDF_y_Median{1}, Y_Batch_Results_ind.Random_CDF_y_Lower{1}, Y_Batch_Results_ind.Random_CDF_y_Upper{1}); % independent random CDF
 l(1).Color = Y_color;
 l(2).Color = 'k';
 l(2).LineStyle = '--';
@@ -255,8 +292,8 @@ hold off;
 % Aggregated CDFs
 subplot(2,3,3);
 hold on;
-[l(1), e(1)] = plot_error(Batch_Results_agg.YX_Observed_CDF_x{1}, Batch_Results_agg.YX_Observed_CDF_y_Median{1}, Batch_Results_agg.YX_Observed_CDF_y_Lower{1}, Batch_Results_agg.YX_Observed_CDF_y_Upper{1}); % aggregated observed CDF
-[l(2), e(2)] = plot_error(Batch_Results_agg.YX_Random_CDF_x{1}, Batch_Results_agg.YX_Random_CDF_y_Median{1}, Batch_Results_agg.YX_Random_CDF_y_Lower{1}, Batch_Results_agg.YX_Random_CDF_y_Upper{1}); % aggregated random CDF
+[l(1), e(1)] = plot_error(Y_Batch_Results_agg.Observed_CDF_x{1}, Y_Batch_Results_agg.Observed_CDF_y_Median{1}, Y_Batch_Results_agg.Observed_CDF_y_Lower{1}, Y_Batch_Results_agg.Observed_CDF_y_Upper{1}); % aggregated observed CDF
+[l(2), e(2)] = plot_error(Y_Batch_Results_agg.Random_CDF_x{1}, Y_Batch_Results_agg.Random_CDF_y_Median{1}, Y_Batch_Results_agg.Random_CDF_y_Lower{1}, Y_Batch_Results_agg.Random_CDF_y_Upper{1}); % aggregated random CDF
 l(1).Color = Y_color;
 l(2).Color = 'k';
 l(2).LineStyle = '--';
@@ -275,7 +312,7 @@ hold off;
 subplot(2, 3, 4);
 hold on;
 plot([0, xmax], [0, 0], 'k'); % plot black line across x-axis to highlight y=0
-[p, e] = plot_error(Batch_Results_dis.YX_Delta_CDF_x{1}, Batch_Results_dis.YX_Delta_CDF_y_Median{1}, Batch_Results_dis.YX_Delta_CDF_y_Lower{1}, Batch_Results_dis.YX_Delta_CDF_y_Upper{1}); % dispersed delta CDF
+[p, e] = plot_error(Y_Batch_Results_dis.Delta_CDF_x{1}, Y_Batch_Results_dis.Delta_CDF_y_Median{1}, Y_Batch_Results_dis.Delta_CDF_y_Lower{1}, Y_Batch_Results_dis.Delta_CDF_y_Upper{1}); % dispersed delta CDF
 p.Color = Y_color;
 e.FaceColor = Y_color;
 xlabel("Distance from X", 'FontAngle', 'italic');
@@ -290,7 +327,7 @@ hold off;
 subplot(2, 3, 5);
 hold on;
 plot([0, xmax], [0, 0], 'k'); % plot black line across x-axis to highlight y=0
-[p, e] = plot_error(Batch_Results_ind.YX_Delta_CDF_x{1}, Batch_Results_ind.YX_Delta_CDF_y_Median{1}, Batch_Results_ind.YX_Delta_CDF_y_Lower{1}, Batch_Results_ind.YX_Delta_CDF_y_Upper{1}); % indpendent delta CDF
+[p, e] = plot_error(Y_Batch_Results_ind.Delta_CDF_x{1}, Y_Batch_Results_ind.Delta_CDF_y_Median{1}, Y_Batch_Results_ind.Delta_CDF_y_Lower{1}, Y_Batch_Results_ind.Delta_CDF_y_Upper{1}); % indpendent delta CDF
 p.Color = Y_color;
 e.FaceColor = Y_color;
 xlabel("Distance from X", 'FontAngle', 'italic');
@@ -305,7 +342,7 @@ hold off;
 subplot(2, 3, 6);
 hold on;
 plot([0, xmax], [0, 0], 'k'); % plot black line across x-axis to highlight y=0
-[p, e] = plot_error(Batch_Results_agg.YX_Delta_CDF_x{1}, Batch_Results_agg.YX_Delta_CDF_y_Median{1}, Batch_Results_agg.YX_Delta_CDF_y_Lower{1}, Batch_Results_agg.YX_Delta_CDF_y_Upper{1}); % aggregated delta CDF
+[p, e] = plot_error(Y_Batch_Results_agg.Delta_CDF_x{1}, Y_Batch_Results_agg.Delta_CDF_y_Median{1}, Y_Batch_Results_agg.Delta_CDF_y_Lower{1}, Y_Batch_Results_agg.Delta_CDF_y_Upper{1}); % aggregated delta CDF
 p.Color = Y_color;
 e.FaceColor = Y_color;
 xlabel("Distance from X", 'FontAngle', 'italic');
@@ -322,9 +359,9 @@ figure;
 hold on;
 plot([-1, 1], [0, 0], 'k'); % plot black line across x-axis to highlight y=0
 plot([0, 0], [-1, 1], 'k'); % plot black line across x-axis to highlight x=0
-s(1) = scatter(Batch_Results_dis.XY_Sample_Spatial_Association_Index{1}, Batch_Results_dis.YX_Sample_Spatial_Association_Index{1},'filled','markeredgecolor','k'); % dispersed
-s(2) = scatter(Batch_Results_ind.XY_Sample_Spatial_Association_Index{1}, Batch_Results_ind.YX_Sample_Spatial_Association_Index{1},'filled','markeredgecolor','k'); % independent
-s(3) = scatter(Batch_Results_agg.XY_Sample_Spatial_Association_Index{1}, Batch_Results_agg.YX_Sample_Spatial_Association_Index{1},'filled','markeredgecolor','k'); % aggregated
+s(1) = scatter(X_Batch_Results_dis.Sample_Spatial_Association_Index{1}, Y_Batch_Results_dis.Sample_Spatial_Association_Index{1},'filled','markeredgecolor','k'); % dispersed
+s(2) = scatter(X_Batch_Results_ind.Sample_Spatial_Association_Index{1}, Y_Batch_Results_ind.Sample_Spatial_Association_Index{1},'filled','markeredgecolor','k'); % independent
+s(3) = scatter(X_Batch_Results_agg.Sample_Spatial_Association_Index{1}, Y_Batch_Results_agg.Sample_Spatial_Association_Index{1},'filled','markeredgecolor','k'); % aggregated
 legend(s,["Dispersed","Independent","Aggregated"],'location','best');
 title("Spatial Association Index Phase Diagram");
 xlabel("X\rightarrowY Spatial Association");

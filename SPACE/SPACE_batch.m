@@ -33,6 +33,10 @@ function [Results_Batch] = SPACE_batch(SPACE_Results)
 % Email: andysoltisz@gmail.com
 % Last Updated: 03/27/2025
 %
+% Copyright 2025, Andrew Michael Soltisz. All rights reserved.
+% This source code is licensed under the BSD-3-Clause License found in the
+% LICENSE.txt file in the root directory of this source tree.
+%
 % -------------------------------------------------------------------------
 
 

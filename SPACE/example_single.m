@@ -13,16 +13,16 @@
 % Email: andysoltisz@gmail.com
 % GitHub: https://github.com/andrewsoltisz/SPACE---Spatial-Pattern-Analysis-using-Closest-Events
 % Publication: https://doi.org/10.1093/mam/ozae022
-% Last Updated: 10/05/2023
+% Last Updated: 03/27/2025
 %
-% Copyright 2024, Andrew Michael Soltisz. All rights reserved.
+% Copyright 2025, Andrew Michael Soltisz. All rights reserved.
 % This source code is licensed under the BSD-3-Clause License found in the
 % LICENSE.txt file in the root directory of this source tree.
 
 %% Prepare environment
 
 clear all;
-close all;
+% close all;
 clc;
 
 %% Import example data
@@ -37,15 +37,13 @@ example_data = [example_data,filesep];
 X_mask = imread([example_data, 'X_mask.tif']);
 Y_mask = imread([example_data, 'Y_mask.tif']);
 ROI_mask = imread([example_data, 'ROI_mask.tif']);
+pixelSize = 0.2; % micrometers
 
 %% Single Image SPACE Analysis 
 
-% different use cases are listed below, un-comment one at a time
-
-[Results_X, Results_Y] = SPACE(X_mask, Y_mask); % default ROI is full image
-% [Results_X, Results_Y] = SPACE(X_mask, Y_mask, ROI_mask); % specify ROI
-% [Results_X, Results_Y] = SPACE(X_mask, Y_mask, [], 0.2); % no ROI but pixel size of 0.2um is specified, input ROI as empty matrix
-% [Results_X, Results_Y] = SPACE(X_mask, Y_mask, ROI_mask, 0.2); % Both ROI and pixel size of 0.2um are specified
+% perform analysis from the perspective of both event species
+Results_X = SPACE(X_mask, Y_mask, ROI_mask, pixelSize);  
+Results_Y = SPACE(Y_mask, X_mask, ROI_mask, pixelSize); 
 
 %% Plot Results
 

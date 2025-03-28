@@ -42,17 +42,15 @@ load([example_data, 'X_mask_list.mat']);
 load([example_data, 'Y_mask_list.mat']);
 load([example_data, 'ROI_mask_list.mat']);
 n_images = numel(X_mask_list);
+pixelSize = 0.2; % micrometers
 
 %% Batch image SPACE analysis
 
-% Different use cases are listed below, un-comment one at a time
-
 wb = waitbar(0, sprintf("Analyzing image: %i/%i", 0, n_images));
 for i_image = 1:n_images
-    [Results_X(i_image,:), Results_Y(i_image,:)] = SPACE(X_mask_list{i_image}, Y_mask_list{i_image}); % default ROI is full image
-    % [Single_Results, Batch_Results] = SPACE(X_mask_list{i_image}, Y_mask_list{i_image}, ROI_mask_list{i_image}); % specify ROI
-    % [Single_Results, Batch_Results] = SPACE(X_mask_list{i_image}, Y_mask_list{i_image}, [], 0.2); % no ROI but pixel size of 0.2um is specified, input ROI as empty matrix
-    % [Single_Results, Batch_Results] = SPACE(X_mask_list{i_image}, Y_mask_list{i_image}, ROI_mask_list{i_image}, 0.2); % Both ROI and pixel size of 0.2um are specified
+
+    Results_X(i_image,:) = SPACE(X_mask_list{i_image}, Y_mask_list{i_image}, ROI_mask_list{i_image}, pixelSize); 
+    Results_Y(i_image,:) = SPACE(Y_mask_list{i_image}, X_mask_list{i_image}, ROI_mask_list{i_image}, pixelSize);
 
     waitbar(i_image/n_images, wb, sprintf("Analyzing image: %i/%i", i_image, n_images));
 end

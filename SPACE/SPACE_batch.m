@@ -31,7 +31,7 @@ function [Results_Batch] = SPACE_batch(SPACE_Results)
 % Spatial Pattern Analysis using Closest Events (SPACE)
 % Author: Andrew M. Soltisz
 % Email: andysoltisz@gmail.com
-% Last Updated: 05/11/2023
+% Last Updated: 03/27/2025
 %
 % -------------------------------------------------------------------------
 

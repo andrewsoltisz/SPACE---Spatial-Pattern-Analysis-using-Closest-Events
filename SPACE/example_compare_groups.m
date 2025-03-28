@@ -22,7 +22,7 @@
 % Email: andysoltisz@gmail.com
 % GitHub: https://github.com/andrewsoltisz/SPACE---Spatial-Pattern-Analysis-using-Closest-Events
 % Publication: https://doi.org/10.1093/mam/ozae022
-% Last Updated: 10/05/2023
+% Last Updated: 03/27/2025
 %
 % Copyright 2024, Andrew Michael Soltisz. All rights reserved.
 % This source code is licensed under the BSD-3-Clause License found in the
@@ -66,7 +66,8 @@ n_images_agg = numel(X_mask_list_agg);
 % dispersed dataset
 wb = waitbar(0, sprintf("Analyzing dispersed image: %i/%i", 0, n_images_dis));
 for i_image = 1:n_images_dis
-    [X_Results_dis(i_image,:), Y_Results_dis(i_image,:)] = SPACE(X_mask_list_dis{i_image}, Y_mask_list_dis{i_image}); % default ROI is full image
+    X_Results_dis(i_image,:) = SPACE(X_mask_list_dis{i_image}, Y_mask_list_dis{i_image});
+    Y_Results_dis(i_image,:) = SPACE(Y_mask_list_dis{i_image}, X_mask_list_dis{i_image});
     waitbar(i_image/n_images_dis, wb, sprintf("Analyzing dispersed image: %i/%i", i_image, n_images_dis));
 end
 close(wb);
@@ -74,7 +75,8 @@ close(wb);
 % independent dataset
 wb = waitbar(0, sprintf("Analyzing independent image: %i/%i", 0, n_images_ind));
 for i_image = 1:n_images_ind
-    [X_Results_ind(i_image,:), Y_Results_ind(i_image,:)] = SPACE(X_mask_list_ind{i_image}, Y_mask_list_ind{i_image}); % default ROI is full image
+    X_Results_ind(i_image,:) = SPACE(X_mask_list_ind{i_image}, Y_mask_list_ind{i_image}); 
+    Y_Results_ind(i_image,:) = SPACE(Y_mask_list_ind{i_image}, X_mask_list_ind{i_image}); 
     waitbar(i_image/n_images_ind, wb, sprintf("Analyzing independent image: %i/%i", i_image, n_images_ind));
 end
 close(wb);
@@ -82,7 +84,8 @@ close(wb);
 % aggregated dataset
 wb = waitbar(0, sprintf("Analyzing aggregated image: %i/%i", 0, n_images_agg));
 for i_image = 1:n_images_agg
-    [X_Results_agg(i_image,:), Y_Results_agg(i_image,:)] = SPACE(X_mask_list_agg{i_image}, Y_mask_list_agg{i_image}); % default ROI is full image
+    X_Results_agg(i_image,:) = SPACE(X_mask_list_agg{i_image}, Y_mask_list_agg{i_image}); 
+    Y_Results_agg(i_image,:) = SPACE(Y_mask_list_agg{i_image}, X_mask_list_agg{i_image}); 
     waitbar(i_image/n_images_agg, wb, sprintf("Analyzing aggregated image: %i/%i", i_image, n_images_agg));
 end
 close(wb);

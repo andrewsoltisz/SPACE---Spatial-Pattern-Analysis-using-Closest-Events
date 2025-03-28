@@ -51,7 +51,8 @@ ROI – region of interest
 9. **Delta_CDF_x** – x-coordinates (distance) of delta function. Delta functions represent subtraction of the random CDF from the observed CDF.  
 10. **Delta_CDF_y** – y-coordinates (delta probability) of delta function. Corresponding x-coordinates are stored in Delta_CDF_x.  
 11. **Spatial_Association_Index** – spatial association index for describing that type and magnitude of spatial association exhibited between both signals. Computed as the absolute maximum of XY_Delta_CDF_y. This can take on a value between -1 and 1, where negative values indicate dispersion of signals between both masks, positive values indicate aggregation, and values at or near zero indicate random (Poisson) association.  
-12. **Spatial_Association_pValue** – p-value from a 2-sided KS test comparing the observed and random distributions. The null hypothesis states that these distributions are identical and therefor signals from the first mask are CSR relative to signals from the second mask.  
+12. **Spatial_Association_pValue** – p-value from a 2-sided KS test comparing the observed and random distributions. The null hypothesis states that these distributions are identical and therefor signals from the first mask are CSR relative to signals from the second mask.
+13. **Spatial_Association_Verdict** - logical scalar indicating whether the null hypothesis from the KS test was rejected. A value of 'true' indicates there is sufficient evidence to reject the null hypothesis and a value of 'false' indicates there is not sufficient evidence to reject the null hypothesis.
  
 ## Table field definitions for SPACE batch analysis function output. Rows correspond to individual sets of SPACE analyses, columns correspond to diferent results from the batch analysis:  
 1. **Sample_Size** – number of images used to generate the SPACE results.  

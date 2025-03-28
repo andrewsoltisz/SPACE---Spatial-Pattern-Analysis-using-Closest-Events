@@ -18,7 +18,7 @@
 % Publication: https://doi.org/10.1093/mam/ozae022
 % Last Updated: 03/27/2025
 %
-% Copyright 2024, Andrew Michael Soltisz. All rights reserved.
+% Copyright 2025, Andrew Michael Soltisz. All rights reserved.
 % This source code is licensed under the BSD-3-Clause License found in the
 % LICENSE.txt file in the root directory of this source tree.
 

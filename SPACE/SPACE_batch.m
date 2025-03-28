@@ -11,7 +11,7 @@ function [Results_Batch] = SPACE_batch(SPACE_Results)
 % INPUTS:
 %
 % 1. SPACE_Results - SPACE results from individual analyses, formatted as a
-%                    table with n-rows and 12-columns, where n is the
+%                    table with n-rows and 13-columns, where n is the
 %                    number of individual SPACE analyses. 
 %
 % -------------------------------------------------------------------------
@@ -49,10 +49,10 @@ function [Results_Batch] = SPACE_batch(SPACE_Results)
     if nRows < 1
         error("Input table is empty.");
     end
-    if nCols < 12
+    if nCols < 13
         error("Input table has missing columns.");
     end
-    if nCols > 12
+    if nCols > 13
         error("Input table has too many columns.");
     end
 
@@ -114,10 +114,11 @@ end
 
 function [verdict] = fieldsAreValid(SPACE_Results)
 
-    expectedFields = ["Observed_Event_Count","Random_Event_Count",...
+    expectedFields = ["Observed_Event_Count", "Random_Event_Count",...
         "Observed_x", "Observed_PDF_y", "Random_x", "Random_PDF_y",...
-        "Observed_CDF_y","Random_CDF_y", "Delta_CDF_x", "Delta_CDF_y",...
-        "Spatial_Association_Index", "Spatial_Association_pValue"];
+        "Observed_CDF_y", "Random_CDF_y", "Delta_CDF_x", "Delta_CDF_y",...
+        "Spatial_Association_Index", "Spatial_Association_pValue",...
+        "Spatial_Association_Verdict"];
 
     actualFields = string(fields(SPACE_Results))';
     actualFields = actualFields(1:end-3); % ignore meta data fields 
@@ -260,7 +261,6 @@ function [fun_y_median, fun_y_lower, fun_y_upper] = median_fun(fun_y_mat, fun_x,
 %
 % Weighted median and quantiles are calculated according to the Wikipedia
 % page - https://en.wikipedia.org/wiki/Weighted_median. 
-% sample 'i' can be found at delta_cdf_x(:) and delta_cdf_y_mat(:,i). 
 %
 % Spatial Pattern Analysis using Closest Events (SPACE)
 % Author: Andrew M. Soltisz
